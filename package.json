@@ -1,0 +1,24 @@
+{
+  "name": "node_proposal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prasad-m-k/node_proposal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/prasad-m-k/node_proposal/issues"
+  },
+  "homepage": "https://github.com/prasad-m-k/node_proposal#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

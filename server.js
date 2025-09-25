@@ -1,3 +1,4 @@
+// server.js
 // Load environment variables first
 require('dotenv').config();
 

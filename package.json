@@ -8,12 +8,19 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "express": "^4.18.0"
+    "bcryptjs": "^3.0.2",
+    "express": "^4.18.0",
+    "express-session": "^1.18.2",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": ["node", "express", "hello-world"],
+  "keywords": [
+    "node",
+    "express",
+    "hello-world"
+  ],
   "author": "",
   "license": "MIT"
 }

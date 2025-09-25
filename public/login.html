@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AI RFP Proposal Generator</title>
+    <link rel="stylesheet" href="/themes.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="password"], input[type="email"], select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: white;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+            transform: scale(1.2);
+        }
+
+        .checkbox-label:hover {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body class="theme-bright">
+    <div class="login-container">
+        <div class="login-header">
+            <h1>AI RFP Proposal Generator</h1>
+            <p>Please login to continue</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group" id="emailGroup" style="display: none;">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email">
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group" id="themeGroup" style="display: none;">
+                <label for="theme">Preferred Theme</label>
+                <select id="theme" name="theme">
+                    <option value="bright">Bright Mode</option>
+                    <option value="dark">Dark Mode</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="rememberGroup">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="rememberMe" name="rememberMe">
+                    <span class="checkmark"></span>
+                    Remember me for 30 days
+                </label>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="register-link">
+            Don't have an account? <a href="#" id="registerLink">Register here</a>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const registerLink = document.getElementById('registerLink');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    showError(data.message || 'Login failed');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+        });
+
+        registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showRegisterForm();
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function showRegisterForm() {
+            const formTitle = document.querySelector('.login-header h1');
+            const formSubtitle = document.querySelector('.login-header p');
+            const submitBtn = document.querySelector('.login-btn');
+            const registerLinkDiv = document.querySelector('.register-link');
+            const emailGroup = document.getElementById('emailGroup');
+            const emailInput = document.getElementById('email');
+            const themeGroup = document.getElementById('themeGroup');
+
+            if (submitBtn.textContent === 'Login') {
+                formTitle.textContent = 'Register Account';
+                formSubtitle.textContent = 'Create a new account';
+                submitBtn.textContent = 'Register';
+                registerLinkDiv.innerHTML = 'Already have an account? <a href="#" id="loginLink">Login here</a>';
+
+                // Show email and theme fields for registration, hide remember me
+                emailGroup.style.display = 'block';
+                emailInput.required = true;
+                themeGroup.style.display = 'block';
+                document.getElementById('rememberGroup').style.display = 'none';
+
+                document.getElementById('loginLink').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showLoginForm();
+                });
+
+                loginForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('email').value;
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    const theme = document.getElementById('theme').value;
+
+                    try {
+                        const response = await fetch('/api/register', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, username, password, theme }),
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            showError('Registration successful! Please login.');
+                            showLoginForm();
+                        } else {
+                            showError(data.message || 'Registration failed');
+                        }
+                    } catch (error) {
+                        showError('Network error. Please try again.');
+                    }
+                };
+            }
+        }
+
+        function showLoginForm() {
+            const formTitle = document.querySelector('.login-header h1');
+            const formSubtitle = document.querySelector('.login-header p');
+            const submitBtn = document.querySelector('.login-btn');
+            const registerLinkDiv = document.querySelector('.register-link');
+            const emailGroup = document.getElementById('emailGroup');
+            const emailInput = document.getElementById('email');
+            const themeGroup = document.getElementById('themeGroup');
+
+            formTitle.textContent = 'AI RFP Proposal Generator';
+            formSubtitle.textContent = 'Please login to continue';
+            submitBtn.textContent = 'Login';
+            registerLinkDiv.innerHTML = 'Don\'t have an account? <a href="#" id="registerLink">Register here</a>';
+
+            // Hide email and theme fields for login, show remember me
+            emailGroup.style.display = 'none';
+            emailInput.required = false;
+            emailInput.value = '';
+            themeGroup.style.display = 'none';
+            document.getElementById('rememberGroup').style.display = 'block';
+
+            document.getElementById('registerLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showRegisterForm();
+            });
+
+            loginForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const rememberMe = document.getElementById('rememberMe').checked;
+
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password, rememberMe }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        window.location.href = '/';
+                    } else {
+                        showError(data.message || 'Login failed');
+                    }
+                } catch (error) {
+                    showError('Network error. Please try again.');
+                }
+            };
+        }
+    </script>
+</body>
+</html>

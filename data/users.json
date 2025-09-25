@@ -1,0 +1,16 @@
+[
+  {
+    "id": "495bd26b-08dc-46a2-9078-a3282f29caca",
+    "username": "prasadmk",
+    "password": "$2b$10$OXvDfnDzx5XEqZk6odQHxuRBxWFyjf4GMpDOgxRGhMwA962uomawC",
+    "createdAt": "2025-09-25T04:43:08.781Z"
+  },
+  {
+    "id": "26011adc-2deb-4cec-a817-bba930d77690",
+    "username": "mkprasad",
+    "email": "prasad.rocklin@gmail.com",
+    "theme": "bright",
+    "password": "$2b$10$KJBaPokNY8q68V9MdV20z.oFDtBe736TuPvJSuslPMSy.YU7zX54u",
+    "createdAt": "2025-09-25T04:55:01.679Z"
+  }
+]

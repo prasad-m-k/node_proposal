@@ -1,0 +1,180 @@
+/* Bright Theme - Clean, professional, modern */
+.theme-bright {
+    --primary-color: #2563eb;
+    --secondary-color: #1e40af;
+    --accent-color: #3b82f6;
+    --background-color: #ffffff;
+    --surface-color: #f8fafc;
+    --card-background: #ffffff;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --border-color: #e5e7eb;
+    --border-light: #f3f4f6;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --header-gradient: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    --button-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+}
+
+/* Dark Theme - Sophisticated, modern dark */
+.theme-dark {
+    --primary-color: #3b82f6;
+    --secondary-color: #1d4ed8;
+    --accent-color: #60a5fa;
+    --background-color: #0f172a;
+    --surface-color: #1e293b;
+    --card-background: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-color: #475569;
+    --border-light: #374151;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    --header-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    --button-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    --success-color: #22c55e;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+}
+
+/* Global theme application */
+body {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+/* Header theming */
+.header {
+    background: var(--header-gradient);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+/* Card/Surface theming */
+.welcome-section,
+.feature-card {
+    background: var(--card-background);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-light);
+    color: var(--text-primary);
+}
+
+.welcome-section h1 {
+    color: var(--text-primary);
+}
+
+.welcome-section p {
+    color: var(--text-secondary);
+}
+
+.feature-card h3 {
+    color: var(--primary-color);
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+}
+
+/* Button theming */
+.logout-btn {
+    background: var(--button-gradient);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.logout-btn:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+/* User avatar theming */
+.user-avatar {
+    background: var(--accent-color);
+    color: white;
+}
+
+/* Input and form theming */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select {
+    background: var(--surface-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+select:focus {
+    border-color: var(--primary-color);
+}
+
+/* Login form theming */
+.login-container {
+    background: var(--card-background);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-light);
+}
+
+.login-header h1 {
+    color: var(--text-primary);
+}
+
+.login-header p {
+    color: var(--text-secondary);
+}
+
+label {
+    color: var(--text-primary);
+}
+
+.login-btn {
+    background: var(--button-gradient);
+}
+
+.login-btn:hover {
+    background: var(--secondary-color);
+}
+
+.register-link {
+    color: var(--text-secondary);
+}
+
+.register-link a {
+    color: var(--primary-color);
+}
+
+.error-message {
+    color: var(--error-color);
+}
+
+/* Scrollbar theming for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* Selection theming */
+::selection {
+    background-color: var(--primary-color);
+    color: white;
+}

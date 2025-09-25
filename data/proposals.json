@@ -1,0 +1,51 @@
+[
+  {
+    "id": "6a78e097-f332-474c-aff0-7017ca161b58",
+    "userId": "26011adc-2deb-4cec-a817-bba930d77690",
+    "name": "Proposal 3",
+    "summary": "mkprasad's Proposal 3",
+    "status": "draft",
+    "documents": [],
+    "subtasks": [
+      {
+        "id": "f0cef0f0-02ef-49f4-bf3b-41115013c7e9",
+        "key": "upload_rfp",
+        "title": "Upload RFP Document",
+        "description": "Upload the client RFP and generate structured artifacts.",
+        "status": "pending",
+        "metadata": {}
+      },
+      {
+        "id": "e93aec03-5c4f-4f5c-839a-a8d18f1109e0",
+        "key": "org_details",
+        "title": "Upload Organization Details",
+        "description": "Attach your organization profile and reusable assets.",
+        "status": "pending",
+        "metadata": {}
+      },
+      {
+        "id": "9177945a-0b97-4d6c-83cd-880200000368",
+        "key": "solution_outline",
+        "title": "Draft Solution Outline",
+        "description": "Outline the solution approach and key differentiators.",
+        "status": "pending",
+        "metadata": {}
+      },
+      {
+        "id": "675e7529-10e2-4961-9528-0fbac53c106a",
+        "key": "review_finalize",
+        "title": "Review & Finalize",
+        "description": "Review generated content and prepare submission package.",
+        "status": "pending",
+        "metadata": {}
+      }
+    ],
+    "artifacts": {
+      "templates": [],
+      "requirements": []
+    },
+    "order": 3,
+    "createdAt": "2025-09-25T07:10:19.207Z",
+    "updatedAt": "2025-09-25T07:10:19.207Z"
+  }
+]

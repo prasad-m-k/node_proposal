@@ -1,0 +1,11 @@
+{
+  "watch": [
+    "server.js",
+    "app.js",
+    "modules",
+    "public"
+  ],
+  "ignore": [
+    "data/**/*.json"
+  ]
+}

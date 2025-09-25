@@ -42,42 +42,105 @@
                     <h2>Proposal Tasks</h2>
                     <p class="pane-subtitle">Each proposal tracks four key steps from RFP intake to final review.</p>
                 </div>
-                <button id="newProposalBtn" class="btn-create-proposal" type="button">+ New</button>
+                <div class="pane-controls">
+                    <button id="collapsePaneBtn" class="pane-toggle" type="button" aria-expanded="true" aria-label="Collapse proposal pane">⟨</button>
+                    <button id="newProposalBtn" class="btn-create-proposal" type="button">+ New</button>
+                </div>
             </div>
             <div id="proposalError" class="proposal-message" role="alert" aria-live="polite"></div>
             <div id="proposalTree" class="proposal-tree" role="tree"></div>
         </aside>
 
-        <section class="content-area">
-            <section class="welcome-section">
-                <h1>Welcome to AI RFP Proposal Generator</h1>
-                <p>
-                    Generate professional, comprehensive RFP proposals using artificial intelligence.
-                    Our platform helps you create winning proposals quickly and efficiently.
-                </p>
+        <section class="content-area" id="contentArea">
+            <section class="home-content" id="homeContent">
+                <section class="welcome-section">
+                    <h1>Welcome to AI RFP Proposal Generator</h1>
+                    <p>
+                        Generate professional, comprehensive RFP proposals using artificial intelligence.
+                        Our platform helps you create winning proposals quickly and efficiently.
+                    </p>
+                </section>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>Smart Analysis</h3>
+                        <p>AI-powered analysis of RFP requirements to ensure comprehensive proposal coverage.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>Template Library</h3>
+                        <p>Access to professional proposal templates tailored for different industries and sectors.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>Collaboration Tools</h3>
+                        <p>Work with your team in real-time to create and refine proposals collaboratively.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>Export Options</h3>
+                        <p>Export your proposals in multiple formats including PDF, Word, and presentation slides.</p>
+                    </div>
+                </div>
             </section>
 
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h3>Smart Analysis</h3>
-                    <p>AI-powered analysis of RFP requirements to ensure comprehensive proposal coverage.</p>
+            <section class="work-area" id="workArea" hidden>
+                <div class="work-area-header">
+                    <div>
+                        <h2 id="activeProposalName">Select a proposal to get started</h2>
+                        <p id="activeProposalSubtitle">Choose a proposal on the left to walk through the workflow.</p>
+                    </div>
                 </div>
 
-                <div class="feature-card">
-                    <h3>Template Library</h3>
-                    <p>Access to professional proposal templates tailored for different industries and sectors.</p>
-                </div>
+                <div class="workflow-steps" id="workflowSteps">
+                    <article class="workflow-step" id="step-upload">
+                        <h3>Step 1 · Upload RFP Document</h3>
+                        <p>Upload the client RFP. We will analyze the content with Gemini 2.0 Flash, explicitly prompting it to avoid hallucinations, and generate structured artifacts for downstream automation.</p>
 
-                <div class="feature-card">
-                    <h3>Collaboration Tools</h3>
-                    <p>Work with your team in real-time to create and refine proposals collaboratively.</p>
-                </div>
+                        <div class="file-upload">
+                            <label class="file-upload-label">
+                                <input type="file" id="rfpUpload" accept=".pdf,.doc,.docx,.txt,.md,.rtf">
+                                Upload Document
+                            </label>
+                            <small>Supported formats: PDF, Word, TXT, Markdown, RTF.</small>
+                            <div id="uploadStatus" class="upload-status"></div>
+                        </div>
 
-                <div class="feature-card">
-                    <h3>Export Options</h3>
-                    <p>Export your proposals in multiple formats including PDF, Word, and presentation slides.</p>
+                        <div class="step-action">
+                            <button type="button" id="processRfpBtn" class="btn-primary" disabled>Analyze with Gemini</button>
+                        </div>
+
+                        <div id="generatedArtifacts" class="generated-artifacts" hidden>
+                            <h4>Generated Artifacts</h4>
+                            <ul class="artifact-list" id="artifactList"></ul>
+                        </div>
+                    </article>
+
+                    <article class="workflow-step" id="step-org">
+                        <h3>Step 2 · Upload Organization Details</h3>
+                        <p>Provide your company profile, relevant case studies, and reusable assets for proposal assembly.</p>
+                        <div class="step-action">
+                            <button type="button" class="btn-secondary" disabled>Upload Details (Coming Soon)</button>
+                        </div>
+                    </article>
+
+                    <article class="workflow-step" id="step-outline">
+                        <h3>Step 3 · Draft Solution Outline</h3>
+                        <p>Leverage AI-generated insights to build a compelling solution narrative tailored to the RFP.</p>
+                        <div class="step-action">
+                            <button type="button" class="btn-secondary" disabled>Generate Outline (Coming Soon)</button>
+                        </div>
+                    </article>
+
+                    <article class="workflow-step" id="step-review">
+                        <h3>Step 4 · Review & Finalize</h3>
+                        <p>Validate all deliverables, collaborate with stakeholders, and prepare the final submission package.</p>
+                        <div class="step-action">
+                            <button type="button" class="btn-secondary" disabled>Review Checklist (Coming Soon)</button>
+                        </div>
+                    </article>
                 </div>
-            </div>
+            </section>
         </section>
     </main>
 
@@ -86,7 +149,29 @@
         const proposalTree = document.getElementById('proposalTree');
         const proposalError = document.getElementById('proposalError');
         const newProposalBtn = document.getElementById('newProposalBtn');
+        const collapsePaneBtn = document.getElementById('collapsePaneBtn');
+        const dashboardMain = document.querySelector('.dashboard-main');
+        const homeContent = document.getElementById('homeContent');
+        const workArea = document.getElementById('workArea');
+        const activeProposalName = document.getElementById('activeProposalName');
+        const activeProposalSubtitle = document.getElementById('activeProposalSubtitle');
+        const workflowSteps = document.getElementById('workflowSteps');
+        const rfpUpload = document.getElementById('rfpUpload');
+        const processRfpBtn = document.getElementById('processRfpBtn');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const generatedArtifacts = document.getElementById('generatedArtifacts');
+        const artifactList = document.getElementById('artifactList');
+
         let currentProposals = [];
+        let activeProposalId = null;
+        
+        if (workArea) {
+            workArea.hidden = true;
+            workArea.classList.remove('visible');
+        }
+        if (homeContent) {
+            homeContent.hidden = false;
+        }
 
         function applyTheme(theme) {
             const normalizedTheme = theme === 'dark' ? 'dark' : 'bright';
@@ -147,11 +232,49 @@
                     return;
                 }
 
+                const duplicate = currentProposals.some(proposal => proposal.name.toLowerCase() === trimmed.toLowerCase());
+                if (duplicate) {
+                    showProposalError('A proposal with this name already exists. Please choose another name.');
+                    return;
+                }
+
                 await createProposal(trimmed);
             });
         }
 
-        async function loadProposals() {
+        if (collapsePaneBtn && dashboardMain) {
+            collapsePaneBtn.addEventListener('click', () => {
+                const isCollapsed = dashboardMain.classList.toggle('pane-collapsed');
+                collapsePaneBtn.setAttribute('aria-expanded', String(!isCollapsed));
+                collapsePaneBtn.setAttribute('aria-label', isCollapsed ? 'Expand proposal pane' : 'Collapse proposal pane');
+                collapsePaneBtn.textContent = isCollapsed ? '⟩' : '⟨';
+            });
+        }
+
+        if (rfpUpload) {
+            rfpUpload.addEventListener('change', () => {
+                if (rfpUpload.files && rfpUpload.files.length) {
+                    processRfpBtn.disabled = false;
+                    uploadStatus.textContent = `${rfpUpload.files[0].name} selected.`;
+                } else {
+                    processRfpBtn.disabled = true;
+                    uploadStatus.textContent = '';
+                }
+            });
+        }
+
+        if (processRfpBtn) {
+            processRfpBtn.addEventListener('click', () => {
+                if (!rfpUpload.files || !rfpUpload.files.length) {
+                    showProposalError('Please select a document before analyzing.');
+                    return;
+                }
+
+                simulateGeminiProcessing(rfpUpload.files[0]);
+            });
+        }
+
+        async function loadProposals(selectedId) {
             try {
                 clearProposalError();
                 const response = await fetch('/api/proposals', {
@@ -171,6 +294,20 @@
 
                 const data = await response.json();
                 currentProposals = data.proposals || [];
+
+                let targetId = selectedId ?? activeProposalId;
+                if (!currentProposals.some(proposal => proposal.id === targetId)) {
+                    targetId = null;
+                }
+
+                if (!currentProposals.length) {
+                    setActiveProposal(null);
+                } else if (targetId) {
+                    setActiveProposal(targetId);
+                } else {
+                    setActiveProposal(null);
+                }
+
                 renderProposalTree();
             } catch (error) {
                 showProposalError(error.message || 'Failed to load proposals.');
@@ -200,7 +337,7 @@
                     throw new Error(data.message || 'Failed to create proposal');
                 }
 
-                await loadProposals();
+                await loadProposals(data.proposal.id);
             } catch (error) {
                 showProposalError(error.message || 'Failed to create proposal.');
             }
@@ -248,11 +385,18 @@
                 return;
             }
 
-            const proposalsToRender = [...currentProposals].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            const proposalsToRender = [...currentProposals].sort((a, b) => {
+                const timeA = new Date(a.createdAt || 0).getTime();
+                const timeB = new Date(b.createdAt || 0).getTime();
+                return timeA - timeB;
+            });
 
             proposalsToRender.forEach((proposal) => {
                 const node = document.createElement('div');
                 node.className = 'proposal-node';
+                if (proposal.id === activeProposalId) {
+                    node.classList.add('active');
+                }
                 node.setAttribute('role', 'treeitem');
                 node.setAttribute('aria-expanded', 'true');
 
@@ -261,9 +405,11 @@
 
                 const title = document.createElement('div');
                 title.className = 'proposal-title';
+                title.addEventListener('click', () => setActiveProposal(proposal.id));
                 const bullet = document.createElement('span');
                 bullet.className = 'proposal-bullet';
                 bullet.textContent = proposal.name?.charAt(0).toUpperCase() || 'P';
+                bullet.addEventListener('click', () => setActiveProposal(proposal.id));
 
                 const textWrap = document.createElement('div');
                 const nameEl = document.createElement('p');
@@ -282,11 +428,22 @@
                 title.appendChild(bullet);
                 title.appendChild(textWrap);
 
+                const actions = document.createElement('div');
+                actions.className = 'proposal-actions';
+
+                const editBtn = document.createElement('button');
+                editBtn.type = 'button';
+                editBtn.className = 'proposal-edit';
+                editBtn.textContent = 'Edit';
+                editBtn.addEventListener('click', () => {
+                    setActiveProposal(proposal.id);
+                });
+
                 const deleteBtn = document.createElement('button');
                 deleteBtn.type = 'button';
                 deleteBtn.className = 'proposal-delete';
                 deleteBtn.textContent = 'Delete';
-                deleteBtn.dataset.id = proposal.id;
+                    deleteBtn.dataset.id = proposal.id;
 
                 if (currentProposals.length === 1) {
                     deleteBtn.disabled = true;
@@ -299,17 +456,58 @@
                     });
                 }
 
+                actions.appendChild(editBtn);
+                actions.appendChild(deleteBtn);
+
                 heading.appendChild(title);
-                heading.appendChild(deleteBtn);
+                heading.appendChild(actions);
 
                 const treeList = document.createElement('ul');
                 treeList.className = 'proposal-branch';
                 treeList.setAttribute('role', 'group');
 
                 const documentsItem = document.createElement('li');
-                documentsItem.textContent = 'Documents';
                 documentsItem.className = 'proposal-branch-item';
+                const documentsTitle = document.createElement('div');
+                documentsTitle.className = 'task-title';
+                documentsTitle.textContent = 'Documents';
+                documentsItem.appendChild(documentsTitle);
+
+                if (documentCount > 0) {
+                    const docList = document.createElement('ul');
+                    docList.className = 'proposal-sublist';
+                    proposal.documents.forEach((doc) => {
+                        const docItem = document.createElement('li');
+                        docItem.className = 'proposal-subitem';
+                        docItem.textContent = doc.name || 'Untitled document';
+                        docList.appendChild(docItem);
+                    });
+                    documentsItem.appendChild(docList);
+                }
+
                 treeList.appendChild(documentsItem);
+
+                const artifactOutputs = (proposal.artifacts && proposal.artifacts.outputs) || [];
+                if (artifactOutputs.length) {
+                    const artifactsItem = document.createElement('li');
+                    artifactsItem.className = 'proposal-branch-item';
+                    const artifactsTitle = document.createElement('div');
+                    artifactsTitle.className = 'task-title';
+                    artifactsTitle.textContent = 'Artifacts';
+                    artifactsItem.appendChild(artifactsTitle);
+
+                    const artifactList = document.createElement('ul');
+                    artifactList.className = 'proposal-sublist';
+                    artifactOutputs.forEach((artifact) => {
+                        const artifactItem = document.createElement('li');
+                        artifactItem.className = 'proposal-subitem';
+                        artifactItem.textContent = `${artifact.type}: ${artifact.name}`;
+                        artifactList.appendChild(artifactItem);
+                    });
+                    artifactsItem.appendChild(artifactList);
+
+                    treeList.appendChild(artifactsItem);
+                }
 
                 (proposal.subtasks || []).forEach((task) => {
                     const taskItem = document.createElement('li');
@@ -332,6 +530,145 @@
 
                 proposalTree.appendChild(node);
             });
+        }
+
+        function setActiveProposal(proposalId) {
+            activeProposalId = proposalId;
+
+            if (!proposalId) {
+                activeProposalName.textContent = 'Select a proposal to get started';
+                activeProposalSubtitle.textContent = 'Choose a proposal on the left to walk through the workflow.';
+                if (workArea) {
+                    workArea.classList.remove('visible');
+                    workArea.hidden = true;
+                }
+                if (homeContent) {
+                    homeContent.hidden = false;
+                }
+                if (processRfpBtn) {
+                    processRfpBtn.disabled = true;
+                }
+                if (generatedArtifacts) {
+                    generatedArtifacts.hidden = true;
+                }
+                if (artifactList) {
+                    artifactList.innerHTML = '';
+                }
+                if (rfpUpload) {
+                    rfpUpload.value = '';
+                }
+                if (uploadStatus) {
+                    uploadStatus.textContent = '';
+                }
+                renderProposalTree();
+                return;
+            }
+
+            const proposal = currentProposals.find(p => p.id === proposalId);
+            if (!proposal) {
+                return;
+            }
+
+            activeProposalName.textContent = proposal.name || 'Untitled Proposal';
+            activeProposalSubtitle.textContent = 'Work through each step to build a complete proposal.';
+            if (homeContent) {
+                homeContent.hidden = true;
+            }
+            if (workArea) {
+                workArea.hidden = false;
+                workArea.classList.add('visible');
+            }
+
+            if (!proposal.artifacts || !proposal.artifacts.outputs) {
+                proposal.artifacts = proposal.artifacts || {};
+                proposal.artifacts.outputs = [];
+            }
+
+            renderArtifacts(proposal.artifacts.outputs);
+            renderProposalTree();
+        }
+
+        function renderArtifacts(outputs = []) {
+            artifactList.innerHTML = '';
+
+            if (!outputs.length) {
+                generatedArtifacts.hidden = true;
+                return;
+            }
+
+            generatedArtifacts.hidden = false;
+
+            outputs.forEach((artifact) => {
+                const item = document.createElement('li');
+                item.className = 'artifact-item';
+
+                const type = document.createElement('span');
+                type.className = 'artifact-type';
+                type.textContent = artifact.type;
+
+                const name = document.createElement('span');
+                name.className = 'artifact-name';
+                name.textContent = artifact.name;
+
+                item.appendChild(type);
+                item.appendChild(name);
+
+                artifactList.appendChild(item);
+            });
+        }
+
+        function simulateGeminiProcessing(file) {
+            if (!activeProposalId) {
+                showProposalError('Please select a proposal before analyzing documents.');
+                return;
+            }
+
+            clearProposalError();
+            processRfpBtn.disabled = true;
+            processRfpBtn.textContent = 'Analyzing…';
+            uploadStatus.textContent = `Uploading ${file.name}…`;
+
+            setTimeout(() => {
+                uploadStatus.textContent = 'Analyzing with Gemini 2.0 Flash (hallucination guard enabled)…';
+
+                setTimeout(() => {
+                    uploadStatus.textContent = 'Artifacts generated successfully by Gemini 2.0 Flash.';
+                    processRfpBtn.textContent = 'Analyze with Gemini';
+                    processRfpBtn.disabled = false;
+
+                    const proposal = currentProposals.find(p => p.id === activeProposalId);
+                    if (!proposal) {
+                        return;
+                    }
+
+                    proposal.documents = proposal.documents || [];
+                    proposal.documents.push({ id: Date.now(), name: file.name, uploadedAt: new Date().toISOString() });
+
+                    proposal.artifacts = proposal.artifacts || {};
+                    const safeBaseName = (proposal.name || 'Proposal').replace(/\s+/g, '-').toLowerCase();
+
+                    proposal.artifacts.outputs = [
+                        {
+                            id: `${Date.now()}-template-md`,
+                            type: 'Markdown Template',
+                            name: `${safeBaseName}-response-template.md`
+                        },
+                        {
+                            id: `${Date.now()}-variables-json`,
+                            type: 'Variable Schema',
+                            name: `${safeBaseName}-variables.json`
+                        },
+                        {
+                            id: `${Date.now()}-requirements-md`,
+                            type: 'Requirements Summary',
+                            name: `${safeBaseName}-requirements.md`
+                        }
+                    ];
+
+                    renderArtifacts(proposal.artifacts.outputs);
+                    renderProposalTree();
+                }, 1500);
+            }, 1200);
         }
 
         function showProposalError(message) {

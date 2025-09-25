@@ -8,6 +8,7 @@ class SimpleDatabase {
         this.dataDir = path.join(__dirname, '..', 'data');
         this.usersFile = path.join(this.dataDir, 'users.json');
         this.sessionsFile = path.join(this.dataDir, 'sessions.json');
+        this.proposalsFile = path.join(this.dataDir, 'proposals.json');
         this.init();
     }
 
@@ -27,6 +28,13 @@ class SimpleDatabase {
                 await fs.access(this.sessionsFile);
             } catch {
                 await fs.writeFile(this.sessionsFile, JSON.stringify([], null, 2));
+            }
+
+            // Initialize proposals file if it doesn't exist
+            try {
+                await fs.access(this.proposalsFile);
+            } catch {
+                await fs.writeFile(this.proposalsFile, JSON.stringify([], null, 2));
             }
         } catch (error) {
             console.error('Database initialization error:', error);
@@ -51,6 +59,14 @@ class SimpleDatabase {
             console.error(`Error writing file ${filePath}:`, error);
             return false;
         }
+    }
+
+    async getAllProposals() {
+        return this.readFile(this.proposalsFile);
+    }
+
+    async saveAllProposals(proposals) {
+        return this.writeFile(this.proposalsFile, proposals);
     }
 
     // User management methods
@@ -253,6 +269,49 @@ class SimpleDatabase {
             console.error('Error cleaning expired sessions:', error);
             return false;
         }
+    }
+
+    // Proposal management methods
+    async getProposalsByUser(userId) {
+        try {
+            const proposals = await this.getAllProposals();
+            return proposals.filter(proposal => proposal.userId === userId);
+        } catch (error) {
+            console.error('Error fetching proposals:', error);
+            return [];
+        }
+    }
+
+    async saveProposalRecord(proposal) {
+        const proposals = await this.getAllProposals();
+        proposals.push(proposal);
+        await this.saveAllProposals(proposals);
+        return proposal;
+    }
+
+    async updateProposalRecord(proposal) {
+        const proposals = await this.getAllProposals();
+        const index = proposals.findIndex(p => p.id === proposal.id && p.userId === proposal.userId);
+
+        if (index === -1) {
+            throw new Error('Proposal not found');
+        }
+
+        proposals[index] = proposal;
+        await this.saveAllProposals(proposals);
+        return proposal;
+    }
+
+    async deleteProposalRecord(userId, proposalId) {
+        const proposals = await this.getAllProposals();
+        const filtered = proposals.filter(p => !(p.id === proposalId && p.userId === userId));
+
+        if (filtered.length === proposals.length) {
+            throw new Error('Proposal not found');
+        }
+
+        await this.saveAllProposals(filtered);
+        return true;
     }
 }
 

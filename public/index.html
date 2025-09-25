@@ -35,40 +35,58 @@
         </div>
     </header>
 
-    <main class="main-content">
-        <section class="welcome-section">
-            <h1>Welcome to AI RFP Proposal Generator</h1>
-            <p>
-                Generate professional, comprehensive RFP proposals using artificial intelligence.
-                Our platform helps you create winning proposals quickly and efficiently.
-            </p>
+    <main class="dashboard-main">
+        <aside class="proposal-pane" aria-label="Proposal tasks">
+            <div class="pane-header">
+                <div>
+                    <h2>Proposal Tasks</h2>
+                    <p class="pane-subtitle">Each proposal tracks four key steps from RFP intake to final review.</p>
+                </div>
+                <button id="newProposalBtn" class="btn-create-proposal" type="button">+ New</button>
+            </div>
+            <div id="proposalError" class="proposal-message" role="alert" aria-live="polite"></div>
+            <div id="proposalTree" class="proposal-tree" role="tree"></div>
+        </aside>
+
+        <section class="content-area">
+            <section class="welcome-section">
+                <h1>Welcome to AI RFP Proposal Generator</h1>
+                <p>
+                    Generate professional, comprehensive RFP proposals using artificial intelligence.
+                    Our platform helps you create winning proposals quickly and efficiently.
+                </p>
+            </section>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Smart Analysis</h3>
+                    <p>AI-powered analysis of RFP requirements to ensure comprehensive proposal coverage.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Template Library</h3>
+                    <p>Access to professional proposal templates tailored for different industries and sectors.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Collaboration Tools</h3>
+                    <p>Work with your team in real-time to create and refine proposals collaboratively.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Export Options</h3>
+                    <p>Export your proposals in multiple formats including PDF, Word, and presentation slides.</p>
+                </div>
+            </div>
         </section>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>Smart Analysis</h3>
-                <p>AI-powered analysis of RFP requirements to ensure comprehensive proposal coverage.</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>Template Library</h3>
-                <p>Access to professional proposal templates tailored for different industries and sectors.</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>Collaboration Tools</h3>
-                <p>Work with your team in real-time to create and refine proposals collaboratively.</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>Export Options</h3>
-                <p>Export your proposals in multiple formats including PDF, Word, and presentation slides.</p>
-            </div>
-        </div>
     </main>
 
     <script>
         const themeStylesheet = document.getElementById('themeStylesheet');
+        const proposalTree = document.getElementById('proposalTree');
+        const proposalError = document.getElementById('proposalError');
+        const newProposalBtn = document.getElementById('newProposalBtn');
+        let currentProposals = [];
 
         function applyTheme(theme) {
             const normalizedTheme = theme === 'dark' ? 'dark' : 'bright';
@@ -103,6 +121,8 @@
                     // Apply user's theme preference
                     const theme = userData.theme || 'bright';
                     applyTheme(theme);
+
+                    await loadProposals();
                 } else {
                     window.location.href = '/login';
                 }
@@ -111,6 +131,232 @@
                 window.location.href = '/login';
             }
         });
+
+        if (newProposalBtn) {
+            newProposalBtn.addEventListener('click', async () => {
+                const defaultName = `Proposal ${currentProposals.length + 1}`;
+                const proposalName = prompt('Enter a name for the new proposal task:', defaultName);
+
+                if (proposalName === null) {
+                    return; // User cancelled
+                }
+
+                const trimmed = proposalName.trim();
+                if (!trimmed) {
+                    showProposalError('Proposal name cannot be empty.');
+                    return;
+                }
+
+                await createProposal(trimmed);
+            });
+        }
+
+        async function loadProposals() {
+            try {
+                clearProposalError();
+                const response = await fetch('/api/proposals', {
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Unable to load proposals');
+                }
+
+                const data = await response.json();
+                currentProposals = data.proposals || [];
+                renderProposalTree();
+            } catch (error) {
+                showProposalError(error.message || 'Failed to load proposals.');
+            }
+        }
+
+        async function createProposal(name) {
+            try {
+                clearProposalError();
+                const response = await fetch('/api/proposals', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ name }),
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to create proposal');
+                }
+
+                await loadProposals();
+            } catch (error) {
+                showProposalError(error.message || 'Failed to create proposal.');
+            }
+        }
+
+        async function deleteProposal(id) {
+            try {
+                clearProposalError();
+                const response = await fetch(`/api/proposals/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to delete proposal');
+                }
+
+                await loadProposals();
+            } catch (error) {
+                showProposalError(error.message || 'Failed to delete proposal.');
+            }
+        }
+
+        function renderProposalTree() {
+            if (!proposalTree) {
+                return;
+            }
+
+            proposalTree.innerHTML = '';
+
+            if (!currentProposals.length) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'proposal-empty';
+                emptyState.textContent = 'No proposals yet. Create one to get started.';
+                proposalTree.appendChild(emptyState);
+                return;
+            }
+
+            const proposalsToRender = [...currentProposals].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+            proposalsToRender.forEach((proposal) => {
+                const node = document.createElement('div');
+                node.className = 'proposal-node';
+                node.setAttribute('role', 'treeitem');
+                node.setAttribute('aria-expanded', 'true');
+
+                const heading = document.createElement('div');
+                heading.className = 'proposal-heading';
+
+                const title = document.createElement('div');
+                title.className = 'proposal-title';
+                const bullet = document.createElement('span');
+                bullet.className = 'proposal-bullet';
+                bullet.textContent = proposal.name?.charAt(0).toUpperCase() || 'P';
+
+                const textWrap = document.createElement('div');
+                const nameEl = document.createElement('p');
+                nameEl.className = 'proposal-name';
+                nameEl.textContent = proposal.name || 'Untitled Proposal';
+
+                const metaEl = document.createElement('p');
+                metaEl.className = 'proposal-meta';
+                const documentCount = Array.isArray(proposal.documents) ? proposal.documents.length : 0;
+                const subtaskCount = Array.isArray(proposal.subtasks) ? proposal.subtasks.length : 0;
+                metaEl.textContent = `${documentCount} documents • ${subtaskCount} subtasks`;
+
+                textWrap.appendChild(nameEl);
+                textWrap.appendChild(metaEl);
+
+                title.appendChild(bullet);
+                title.appendChild(textWrap);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.className = 'proposal-delete';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.dataset.id = proposal.id;
+
+                if (currentProposals.length === 1) {
+                    deleteBtn.disabled = true;
+                    deleteBtn.title = 'At least one proposal is required.';
+                } else {
+                    deleteBtn.addEventListener('click', () => {
+                        if (confirm(`Delete ${proposal.name}?`)) {
+                            deleteProposal(proposal.id);
+                        }
+                    });
+                }
+
+                heading.appendChild(title);
+                heading.appendChild(deleteBtn);
+
+                const treeList = document.createElement('ul');
+                treeList.className = 'proposal-branch';
+                treeList.setAttribute('role', 'group');
+
+                const documentsItem = document.createElement('li');
+                documentsItem.textContent = 'Documents';
+                documentsItem.className = 'proposal-branch-item';
+                treeList.appendChild(documentsItem);
+
+                (proposal.subtasks || []).forEach((task) => {
+                    const taskItem = document.createElement('li');
+                    taskItem.className = `proposal-branch-item task-${task.status}`;
+                    const taskTitle = document.createElement('div');
+                    taskTitle.className = 'task-title';
+                    taskTitle.textContent = task.title;
+
+                    const taskStatus = document.createElement('div');
+                    taskStatus.className = 'task-status';
+                    taskStatus.textContent = formatStatus(task.status);
+
+                    taskItem.appendChild(taskTitle);
+                    taskItem.appendChild(taskStatus);
+                    treeList.appendChild(taskItem);
+                });
+
+                node.appendChild(heading);
+                node.appendChild(treeList);
+
+                proposalTree.appendChild(node);
+            });
+        }
+
+        function showProposalError(message) {
+            if (proposalError) {
+                proposalError.textContent = message;
+                proposalError.style.display = 'block';
+            }
+        }
+
+        function clearProposalError() {
+            if (proposalError) {
+                proposalError.textContent = '';
+                proposalError.style.display = 'none';
+            }
+        }
+
+        function formatStatus(status) {
+            if (!status) {
+                return 'Pending';
+            }
+
+            return status
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, match => match.toUpperCase());
+        }
 
         // Logout function
         async function logout() {

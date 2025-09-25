@@ -61,9 +61,17 @@ class AuthMiddleware {
 
     // Helper method to handle login redirects
     redirectToLogin(req, res) {
-        if (req.xhr || req.headers.accept?.includes('application/json')) {
+        const wantsJson = Boolean(
+            req.xhr ||
+            req.path?.startsWith('/api') ||
+            req.headers.accept?.includes('application/json') ||
+            req.headers['sec-fetch-mode'] === 'cors'
+        );
+
+        if (wantsJson) {
             return res.status(401).json({ message: 'Authentication required' });
         }
+
         return res.redirect('/login');
     }
 

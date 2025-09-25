@@ -4,152 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI RFP Proposal Generator</title>
-    <link rel="stylesheet" href="/themes.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f5f7fa;
-            min-height: 100vh;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .user-section {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .profile-btn, .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .profile-btn:hover, .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .main-content {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        .welcome-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .welcome-section h1 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-
-        .welcome-section p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-card h3 {
-            color: #667eea;
-            margin-bottom: 1rem;
-        }
-
-        .feature-card p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
+    <link id="themeStylesheet" rel="stylesheet" href="/bright.css">
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('preferredTheme') || 'bright';
+                window.__preferredTheme = savedTheme;
+                const stylesheet = document.getElementById('themeStylesheet');
+                if (stylesheet) {
+                    stylesheet.href = savedTheme === 'dark' ? '/dark.css' : '/bright.css';
+                }
+            } catch (error) {
+                console.error('Theme preload error:', error);
             }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .main-content {
-                padding: 0 1rem;
-            }
-        }
-    </style>
+        })();
+    </script>
 </head>
-<body>
+<body class="theme-bright app-page">
     <header class="header">
         <div class="header-content">
             <div class="logo">AI RFP Proposal Generator</div>
@@ -197,6 +68,29 @@
     </main>
 
     <script>
+        const themeStylesheet = document.getElementById('themeStylesheet');
+
+        function applyTheme(theme) {
+            const normalizedTheme = theme === 'dark' ? 'dark' : 'bright';
+
+            if (themeStylesheet) {
+                themeStylesheet.href = normalizedTheme === 'dark' ? '/dark.css' : '/bright.css';
+            }
+
+            if (document.body) {
+                document.body.classList.remove('theme-bright', 'theme-dark');
+                document.body.classList.add(`theme-${normalizedTheme}`);
+            }
+
+            try {
+                localStorage.setItem('preferredTheme', normalizedTheme);
+            } catch (error) {
+                console.error('Theme persistence error:', error);
+            }
+        }
+
+        applyTheme(window.__preferredTheme || 'bright');
+
         // Load user information
         window.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -208,7 +102,7 @@
 
                     // Apply user's theme preference
                     const theme = userData.theme || 'bright';
-                    document.body.className = `theme-${theme}`;
+                    applyTheme(theme);
                 } else {
                     window.location.href = '/login';
                 }

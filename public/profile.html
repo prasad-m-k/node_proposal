@@ -4,223 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile - AI RFP Proposal Generator</title>
-    <link rel="stylesheet" href="/themes.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--surface-color);
-            min-height: 100vh;
-        }
-
-        .header {
-            background: var(--header-gradient);
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: var(--shadow);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .back-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-            text-decoration: none;
-        }
-
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .main-content {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        .profile-container {
-            background: var(--card-background);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid var(--border-light);
-        }
-
-        .profile-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .profile-header h1 {
-            color: var(--text-primary);
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .profile-header p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .readonly-field {
-            background: var(--surface-color);
-            border: 2px solid var(--border-color);
-            border-radius: 5px;
-            padding: 0.75rem;
-            font-size: 1rem;
-            color: var(--text-secondary);
-            cursor: not-allowed;
-        }
-
-        input[type="email"], input[type="password"], select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            background: var(--surface-color);
-            color: var(--text-primary);
-        }
-
-        input[type="email"]:focus, input[type="password"]:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        select {
-            cursor: pointer;
-        }
-
-        .password-toggle {
-            position: relative;
-        }
-
-        .password-toggle-btn {
-            position: absolute;
-            right: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .password-toggle-btn:hover {
-            color: var(--primary-color);
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: var(--button-gradient);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: var(--surface-color);
-            color: var(--text-primary);
-            border: 2px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border-light);
-        }
-
-        .success-message, .error-message {
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-size: 0.9rem;
-            display: none;
-        }
-
-        .success-message {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--success-color);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--error-color);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 0 1rem;
+    <link id="themeStylesheet" rel="stylesheet" href="/bright.css">
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('preferredTheme') || 'bright';
+                window.__preferredTheme = savedTheme;
+                const stylesheet = document.getElementById('themeStylesheet');
+                if (stylesheet) {
+                    stylesheet.href = savedTheme === 'dark' ? '/dark.css' : '/bright.css';
+                }
+            } catch (error) {
+                console.error('Theme preload error:', error);
             }
-
-            .form-actions {
-                flex-direction: column;
-            }
-
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-    </style>
+        })();
+    </script>
 </head>
-<body>
+<body class="theme-bright profile-page">
     <header class="header">
         <div class="header-content">
             <div class="logo">AI RFP Proposal Generator</div>
@@ -242,7 +42,7 @@
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="readonly-field" id="username">Loading...</div>
-                    <small style="color: var(--text-muted); font-size: 0.8rem;">Username cannot be changed</small>
+                    <small class="form-hint">Username cannot be changed</small>
                 </div>
 
                 <div class="form-group">
@@ -292,6 +92,33 @@
 
     <script>
         let currentUser = null;
+        const themeStylesheet = document.getElementById('themeStylesheet');
+        const themeSelect = document.getElementById('theme');
+
+        function applyTheme(theme) {
+            const normalizedTheme = theme === 'dark' ? 'dark' : 'bright';
+
+            if (themeStylesheet) {
+                themeStylesheet.href = normalizedTheme === 'dark' ? '/dark.css' : '/bright.css';
+            }
+
+            if (document.body) {
+                document.body.classList.remove('theme-bright', 'theme-dark');
+                document.body.classList.add(`theme-${normalizedTheme}`);
+            }
+
+            if (themeSelect && themeSelect.value !== normalizedTheme) {
+                themeSelect.value = normalizedTheme;
+            }
+
+            try {
+                localStorage.setItem('preferredTheme', normalizedTheme);
+            } catch (error) {
+                console.error('Theme persistence error:', error);
+            }
+        }
+
+        applyTheme(window.__preferredTheme || 'bright');
 
         // Load user information
         window.addEventListener('DOMContentLoaded', async () => {
@@ -303,10 +130,7 @@
                     // Populate form with current data
                     document.getElementById('username').textContent = currentUser.username;
                     document.getElementById('email').value = currentUser.email || '';
-                    document.getElementById('theme').value = currentUser.theme || 'bright';
-
-                    // Apply current theme
-                    document.body.className = `theme-${currentUser.theme || 'bright'}`;
+                    applyTheme(currentUser.theme || 'bright');
                 } else {
                     window.location.href = '/login';
                 }
@@ -315,6 +139,12 @@
                 window.location.href = '/login';
             }
         });
+
+        if (themeSelect) {
+            themeSelect.addEventListener('change', (event) => {
+                applyTheme(event.target.value);
+            });
+        }
 
         // Handle form submission
         document.getElementById('profileForm').addEventListener('submit', async (e) => {
@@ -360,7 +190,7 @@
 
                     // Apply new theme if changed
                     if (formData.theme !== currentUser.theme) {
-                        document.body.className = `theme-${formData.theme}`;
+                        applyTheme(formData.theme);
                         currentUser.theme = formData.theme;
                     }
 

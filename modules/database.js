@@ -282,9 +282,28 @@ class SimpleDatabase {
         }
     }
 
+    async getProposalRecord(userId, proposalId) {
+        try {
+            const proposals = await this.getAllProposals();
+            return proposals.find(proposal => proposal.id === proposalId && proposal.userId === userId) || null;
+        } catch (error) {
+            console.error('Error fetching proposal:', error);
+            return null;
+        }
+    }
+
     async saveProposalRecord(proposal) {
         const proposals = await this.getAllProposals();
-        proposals.push(proposal);
+        const existingIndex = proposals.findIndex(p => p.id === proposal.id && p.userId === proposal.userId);
+
+        if (existingIndex >= 0) {
+            // Update existing proposal
+            proposals[existingIndex] = proposal;
+        } else {
+            // Add new proposal
+            proposals.push(proposal);
+        }
+
         await this.saveAllProposals(proposals);
         return proposal;
     }

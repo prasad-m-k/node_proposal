@@ -1,4 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
+const GeminiService = require('./geminiService');
+const FileService = require('./fileService');
 
 const DEFAULT_PROPOSAL_COUNT = 1;
 
@@ -39,6 +41,8 @@ function buildSubtasks() {
 class ProposalService {
     constructor(db) {
         this.db = db;
+        this.geminiService = new GeminiService();
+        this.fileService = new FileService();
     }
 
     async ensureSeedProposals(userId, username) {
@@ -94,8 +98,141 @@ class ProposalService {
             throw new Error('At least one proposal task is required. Create another proposal before deleting this one.');
         }
 
+        // Clean up generated files for this proposal
+        await this.fileService.deleteGeneratedFiles(proposalId);
+
         await this.db.deleteProposalRecord(userId, proposalId);
         return true;
+    }
+
+    async processRFPDocument(userId, proposalId, filePath, originalName) {
+        try {
+            // Get the proposal
+            const proposal = await this.db.getProposalRecord(userId, proposalId);
+            if (!proposal) {
+                throw new Error('Proposal not found');
+            }
+
+            // Analyze the document with Gemini
+            const analysis = await this.geminiService.analyzeRFPDocument(
+                filePath,
+                originalName,
+                proposal.name
+            );
+
+            // Generate the three required files
+            const nunjucksTemplate = this.geminiService.generateNunjucksTemplate(analysis);
+            const variableTemplate = this.geminiService.generateVariableTemplate(analysis);
+            const requirementsDoc = this.geminiService.generateRequirementsMarkdown(analysis);
+
+            // Save the generated files
+            const safeBaseName = (proposal.name || 'proposal').replace(/\s+/g, '-').toLowerCase();
+
+            const templateFile = await this.fileService.saveGeneratedFile(
+                nunjucksTemplate,
+                `${safeBaseName}-response-template.md`,
+                proposalId,
+                'text'
+            );
+
+            const variableFile = await this.fileService.saveGeneratedFile(
+                variableTemplate,
+                `${safeBaseName}-variables.json`,
+                proposalId,
+                'json'
+            );
+
+            const requirementsFile = await this.fileService.saveGeneratedFile(
+                requirementsDoc,
+                `${safeBaseName}-requirements.md`,
+                proposalId,
+                'text'
+            );
+
+            // Update proposal with document and artifacts
+            proposal.documents = proposal.documents || [];
+            proposal.documents.push({
+                id: uuidv4(),
+                name: originalName,
+                uploadedAt: new Date().toISOString(),
+                analysisCompleted: true
+            });
+
+            proposal.artifacts = proposal.artifacts || {};
+            proposal.artifacts.outputs = [
+                {
+                    id: templateFile.id,
+                    type: 'Template',
+                    name: templateFile.name,
+                    filePath: templateFile.path,
+                    createdAt: templateFile.createdAt
+                },
+                {
+                    id: variableFile.id,
+                    type: 'Variables',
+                    name: variableFile.name,
+                    filePath: variableFile.path,
+                    createdAt: variableFile.createdAt
+                },
+                {
+                    id: requirementsFile.id,
+                    type: 'Requirements',
+                    name: requirementsFile.name,
+                    filePath: requirementsFile.path,
+                    createdAt: requirementsFile.createdAt
+                }
+            ];
+
+            proposal.artifacts.analysis = analysis;
+
+            // Update the upload_rfp subtask status
+            const uploadTask = proposal.subtasks.find(task => task.key === 'upload_rfp');
+            if (uploadTask) {
+                uploadTask.status = 'completed';
+                uploadTask.metadata = {
+                    completedAt: new Date().toISOString(),
+                    documentsProcessed: 1
+                };
+            }
+
+            proposal.updatedAt = new Date().toISOString();
+
+            // Save the updated proposal
+            await this.db.saveProposalRecord(proposal);
+
+            // Clean up the uploaded file
+            await this.fileService.deleteUploadedFile(filePath);
+
+            return {
+                proposal,
+                analysis,
+                artifacts: proposal.artifacts.outputs
+            };
+
+        } catch (error) {
+            console.error('Error processing RFP document:', error);
+            // Clean up uploaded file on error
+            await this.fileService.deleteUploadedFile(filePath);
+            throw error;
+        }
+    }
+
+    async getProposalArtifacts(userId, proposalId) {
+        const proposal = await this.db.getProposalRecord(userId, proposalId);
+        if (!proposal) {
+            throw new Error('Proposal not found');
+        }
+
+        return proposal.artifacts || { outputs: [], analysis: null };
+    }
+
+    async downloadArtifact(userId, proposalId, fileName) {
+        const proposal = await this.db.getProposalRecord(userId, proposalId);
+        if (!proposal) {
+            throw new Error('Proposal not found');
+        }
+
+        return await this.fileService.getGeneratedFile(proposalId, fileName);
     }
 
     _buildProposal({ userId, name, summary, order }) {

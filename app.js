@@ -211,6 +211,80 @@ function createApp() {
         }
     });
 
+    // RFP Document upload and processing
+    app.post('/api/proposals/:proposalId/upload-rfp', auth.requireAuth, (req, res) => {
+        const upload = proposalService.fileService.getUploadMiddleware();
+
+        upload(req, res, async (err) => {
+            if (err) {
+                console.error('Upload error:', err);
+                return res.status(400).json({
+                    success: false,
+                    message: err.message || 'File upload failed'
+                });
+            }
+
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'No file uploaded'
+                });
+            }
+
+            try {
+                const result = await proposalService.processRFPDocument(
+                    req.user.id,
+                    req.params.proposalId,
+                    req.file.path,
+                    req.file.originalname
+                );
+
+                res.json({
+                    success: true,
+                    message: 'RFP document processed successfully',
+                    proposal: result.proposal,
+                    artifacts: result.artifacts,
+                    analysis: result.analysis
+                });
+            } catch (error) {
+                console.error('RFP processing error:', error);
+                res.status(500).json({
+                    success: false,
+                    message: error.message || 'Failed to process RFP document'
+                });
+            }
+        });
+    });
+
+    // Get proposal artifacts
+    app.get('/api/proposals/:proposalId/artifacts', auth.requireAuth, async (req, res) => {
+        try {
+            const artifacts = await proposalService.getProposalArtifacts(req.user.id, req.params.proposalId);
+            res.json({ success: true, artifacts });
+        } catch (error) {
+            console.error('Get artifacts error:', error);
+            res.status(400).json({ success: false, message: error.message || 'Failed to get artifacts' });
+        }
+    });
+
+    // Download artifact
+    app.get('/api/proposals/:proposalId/artifacts/:fileName', auth.requireAuth, async (req, res) => {
+        try {
+            const file = await proposalService.downloadArtifact(
+                req.user.id,
+                req.params.proposalId,
+                req.params.fileName
+            );
+
+            res.setHeader('Content-Type', 'text/plain');
+            res.setHeader('Content-Disposition', `attachment; filename="${req.params.fileName}"`);
+            res.send(file.content);
+        } catch (error) {
+            console.error('Download artifact error:', error);
+            res.status(400).json({ success: false, message: error.message || 'Failed to download artifact' });
+        }
+    });
+
     // 404 handler
     app.use((req, res) => {
         res.status(404).redirect('/login');

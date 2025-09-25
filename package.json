@@ -8,9 +8,15 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.2",
     "express": "^4.18.0",
     "express-session": "^1.18.2",
+    "fs-extra": "^11.3.2",
+    "multer": "^2.0.2",
+    "nunjucks": "^3.2.4",
+    "path-to-regexp": "^8.3.0",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

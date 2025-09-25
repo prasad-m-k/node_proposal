@@ -51,6 +51,8 @@
             <div id="proposalTree" class="proposal-tree" role="tree"></div>
         </aside>
 
+        <div class="resize-handle" id="resizeHandle"></div>
+
         <section class="content-area" id="contentArea">
             <section class="home-content" id="homeContent">
                 <section class="welcome-section">
@@ -151,6 +153,8 @@
         const newProposalBtn = document.getElementById('newProposalBtn');
         const collapsePaneBtn = document.getElementById('collapsePaneBtn');
         const dashboardMain = document.querySelector('.dashboard-main');
+        const resizeHandle = document.getElementById('resizeHandle');
+        const proposalPane = document.querySelector('.proposal-pane');
         const homeContent = document.getElementById('homeContent');
         const workArea = document.getElementById('workArea');
         const activeProposalName = document.getElementById('activeProposalName');
@@ -251,6 +255,83 @@
             });
         }
 
+        // Resizable pane functionality
+        if (resizeHandle && proposalPane) {
+            let isResizing = false;
+            let startX = 0;
+            let startWidth = 0;
+
+            // Load saved width from localStorage
+            const savedWidth = localStorage.getItem('sidebar-width');
+            if (savedWidth) {
+                document.documentElement.style.setProperty('--sidebar-width', savedWidth + 'px');
+            }
+
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                startX = e.clientX;
+                startWidth = proposalPane.offsetWidth;
+
+                resizeHandle.classList.add('dragging');
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'col-resize';
+
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+
+                const deltaX = e.clientX - startX;
+                const newWidth = Math.max(260, Math.min(600, startWidth + deltaX));
+
+                document.documentElement.style.setProperty('--sidebar-width', newWidth + 'px');
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (!isResizing) return;
+
+                isResizing = false;
+                resizeHandle.classList.remove('dragging');
+                document.body.style.userSelect = '';
+                document.body.style.cursor = '';
+
+                // Save the width to localStorage
+                const currentWidth = proposalPane.offsetWidth;
+                localStorage.setItem('sidebar-width', currentWidth);
+            });
+
+            // Touch events for mobile support
+            resizeHandle.addEventListener('touchstart', (e) => {
+                isResizing = true;
+                startX = e.touches[0].clientX;
+                startWidth = proposalPane.offsetWidth;
+
+                resizeHandle.classList.add('dragging');
+                e.preventDefault();
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isResizing) return;
+
+                const deltaX = e.touches[0].clientX - startX;
+                const newWidth = Math.max(260, Math.min(600, startWidth + deltaX));
+
+                document.documentElement.style.setProperty('--sidebar-width', newWidth + 'px');
+            });
+
+            document.addEventListener('touchend', () => {
+                if (!isResizing) return;
+
+                isResizing = false;
+                resizeHandle.classList.remove('dragging');
+
+                // Save the width to localStorage
+                const currentWidth = proposalPane.offsetWidth;
+                localStorage.setItem('sidebar-width', currentWidth);
+            });
+        }
+
         if (rfpUpload) {
             rfpUpload.addEventListener('change', () => {
                 if (rfpUpload.files && rfpUpload.files.length) {
@@ -270,7 +351,7 @@
                     return;
                 }
 
-                simulateGeminiProcessing(rfpUpload.files[0]);
+                processRfpDocument(rfpUpload.files[0]);
             });
         }
 
@@ -610,14 +691,61 @@
                 name.className = 'artifact-name';
                 name.textContent = artifact.name;
 
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'artifact-download';
+                downloadBtn.textContent = 'Download';
+                downloadBtn.addEventListener('click', () => {
+                    downloadArtifact(artifact.name);
+                });
+
                 item.appendChild(type);
                 item.appendChild(name);
+                item.appendChild(downloadBtn);
 
                 artifactList.appendChild(item);
             });
         }
 
-        function simulateGeminiProcessing(file) {
+        async function downloadArtifact(fileName) {
+            if (!activeProposalId) {
+                showProposalError('No active proposal selected.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/proposals/${activeProposalId}/artifacts/${encodeURIComponent(fileName)}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.message || 'Failed to download artifact');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+            } catch (error) {
+                console.error('Error downloading artifact:', error);
+                showProposalError(error.message || 'Failed to download artifact');
+            }
+        }
+
+        async function processRfpDocument(file) {
             if (!activeProposalId) {
                 showProposalError('Please select a proposal before analyzing documents.');
                 return;
@@ -628,47 +756,52 @@
             processRfpBtn.textContent = 'Analyzing…';
             uploadStatus.textContent = `Uploading ${file.name}…`;
 
-            setTimeout(() => {
+            try {
+                const formData = new FormData();
+                formData.append('rfpDocument', file);
+
                 uploadStatus.textContent = 'Analyzing with Gemini 2.0 Flash (hallucination guard enabled)…';
 
-                setTimeout(() => {
-                    uploadStatus.textContent = 'Artifacts generated successfully by Gemini 2.0 Flash.';
-                    processRfpBtn.textContent = 'Analyze with Gemini';
-                    processRfpBtn.disabled = false;
+                const response = await fetch(`/api/proposals/${activeProposalId}/upload-rfp`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
 
-                    const proposal = currentProposals.find(p => p.id === activeProposalId);
-                    if (!proposal) {
-                        return;
-                    }
+                const data = await response.json();
 
-                    proposal.documents = proposal.documents || [];
-                    proposal.documents.push({ id: Date.now(), name: file.name, uploadedAt: new Date().toISOString() });
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
 
-                    proposal.artifacts = proposal.artifacts || {};
-                    const safeBaseName = (proposal.name || 'Proposal').replace(/\s+/g, '-').toLowerCase();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to process document');
+                }
 
-                    proposal.artifacts.outputs = [
-                        {
-                            id: `${Date.now()}-template-md`,
-                            type: 'Markdown Template',
-                            name: `${safeBaseName}-response-template.md`
-                        },
-                        {
-                            id: `${Date.now()}-variables-json`,
-                            type: 'Variable Schema',
-                            name: `${safeBaseName}-variables.json`
-                        },
-                        {
-                            id: `${Date.now()}-requirements-md`,
-                            type: 'Requirements Summary',
-                            name: `${safeBaseName}-requirements.md`
-                        }
-                    ];
+                uploadStatus.textContent = 'Artifacts generated successfully by Gemini 2.0 Flash.';
+                processRfpBtn.textContent = 'Analyze with Gemini';
+                processRfpBtn.disabled = false;
 
-                    renderArtifacts(proposal.artifacts.outputs);
-                    renderProposalTree();
-                }, 1500);
-            }, 1200);
+                // Update the current proposals array with the updated proposal
+                const proposalIndex = currentProposals.findIndex(p => p.id === activeProposalId);
+                if (proposalIndex >= 0) {
+                    currentProposals[proposalIndex] = data.proposal;
+                }
+
+                renderArtifacts(data.artifacts || []);
+                renderProposalTree();
+
+                // Clear the file input
+                rfpUpload.value = '';
+
+            } catch (error) {
+                console.error('Error processing RFP document:', error);
+                showProposalError(error.message || 'Failed to process document');
+                processRfpBtn.textContent = 'Analyze with Gemini';
+                processRfpBtn.disabled = false;
+                uploadStatus.textContent = '';
+            }
         }
 
         function showProposalError(message) {

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI RFP Response Generator</title>
+    <link rel="stylesheet" href="./src/styles/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-file-contract"></i> RFP Sessions</h2>
+            </div>
+            <div class="sessions-list" id="sessionsList">
+                <div style="color: #bbb; text-align: center; padding: 20px;">No sessions yet</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <div class="header-logo">
+                            <!-- <i class="fas fa-robot"></i> -->
+                            <!-- <img src="./src/assets/mstg_logo.png" alt="AI RFP Logo" class="logo-image"> -->
+                        </div>
+                        <div class="header-text">
+                            <h1>AI RFP Response Generator</h1>
+                            <p>Upload your RFP and organization details to generate professional responses</p>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <div class="user-info" id="userInfo">
+                            <div class="user-profile">
+                                <div class="profile-icon" id="profileIcon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-details">
+                                    <div class="user-name" id="userName">Loading...</div>
+                                    <div class="user-username" id="userUsername">@username</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline admin-btn" title="Invalidate All Sessions (Admin)">
+                                <i class="fas fa-shield-alt"></i>
+                            </button>
+                            <button class="btn btn-outline logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Progress Steps -->
+            <div class="progress-container">
+                <div class="progress-step active" id="step1" onclick="goToStep(1)">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Upload RFP</div>
+                </div>
+                <div class="progress-step" id="step2" onclick="goToStep(2)">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Upload Organization</div>
+                </div>
+                <div class="progress-step" id="step3" onclick="goToStep(3)">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Review & Generate</div>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="content-sections">
+                <!-- Step 1: RFP Upload -->
+                <section class="content-section active" id="section1">
+                    <div class="section-header">
+                        <h2>Step 1: Upload RFP Document</h2>
+                        <p>Upload your Request for Proposal document (PDF, TXT, or DOCX)</p>
+                    </div>
+                    
+                    <div class="upload-area" id="rfpUploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag and drop your RFP file here, or click to browse</p>
+                        <input type="file" id="rfpFileInput" accept=".pdf,.txt,.docx" hidden>
+                        <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('rfpFileInput').click()">
+                            Choose File
+                        </button>
+                    </div>
+
+                    <div class="analysis-result hidden" id="rfpAnalysis">
+                        <h3>RFP Requirements Analysis</h3>
+                        <div class="analysis-content" id="rfpRequirements"></div>
+                        <button type="button" class="btn btn-success" onclick="goToStep(2)">
+                            Continue to Organization Upload <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Step 2: Organization Upload -->
+                <section class="content-section" id="section2">
+                    <div class="section-header">
+                        <h2>Step 2: Upload Organization Details</h2>
+                        <p>Upload your organization's profile, capabilities, and credentials</p>
+                    </div>
+                    
+                    <div class="upload-area" id="orgUploadArea">
+                        <i class="fas fa-building"></i>
+                        <p>Drag and drop your organization file here, or click to browse</p>
+                        <input type="file" id="orgFileInput" accept=".pdf,.txt,.docx" hidden>
+                        <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('orgFileInput').click()">
+                            Choose File
+                        </button>
+                    </div>
+
+                    <div class="analysis-result hidden" id="orgAnalysis">
+                        <h3>Organization Analysis</h3>
+                        <div class="analysis-content" id="orgCapabilities"></div>
+                        
+                        <h3>Requirements Matching Analysis</h3>
+                        <div class="matching-table" id="matchingTable"></div>
+                        
+                        <button type="button" class="btn btn-success" onclick="goToStep(3)">
+                            Continue to Response Generation <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Step 3: Generate Response -->
+                <section class="content-section" id="section3">
+                    <div class="section-header">
+                        <h2>Step 3: Generate RFP Response</h2>
+                        <p>Review and customize the response prompt, then generate your document</p>
+                    </div>
+                    
+                    <div class="prompt-editor">
+                        <h3>Response Generation Prompt</h3>
+                        <p class="prompt-instruction">Review and edit the prompt below to customize your RFP response:</p>
+                        <textarea id="responsePrompt" class="prompt-textarea" rows="15" placeholder="The response prompt will appear here..."></textarea>
+                        
+                        <div class="prompt-actions">
+                            <button type="button" class="btn btn-secondary" onclick="resetPrompt()">
+                                <i class="fas fa-undo"></i> Reset to Original
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="generateDocument()">
+                                <i class="fas fa-file-word"></i> Generate DOCX Document
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="download-section hidden" id="downloadSection">
+                        <div class="download-card">
+                            <i class="fas fa-check-circle success-icon"></i>
+                            <h3>Document Generated Successfully!</h3>
+                            <p>Your RFP response document has been created and is ready for download.</p>
+                            <button type="button" class="btn btn-primary" id="downloadBtn">
+                                <i class="fas fa-download"></i> Download DOCX
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div class="loading-overlay hidden" id="loadingOverlay">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p id="loadingText">Processing...</p>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message hidden" id="errorMessage">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="errorText"></span>
+                <button type="button" class="error-close" onclick="hideError()">×</button>
+            </div>
+
+            <!-- Success Message -->
+            <div class="success-message hidden" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                <span id="successText"></span>
+                <button type="button" class="success-close" onclick="hideSuccess()">×</button>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="./src/js/main.js"></script>
+</body>
+</html>

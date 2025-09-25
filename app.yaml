@@ -1,0 +1,26 @@
+runtime: nodejs18
+
+env_variables:
+  NODE_ENV: production
+
+automatic_scaling:
+  min_instances: 0
+  max_instances: 10
+
+resources:
+  cpu: 1
+  memory_gb: 1
+
+# Health check endpoint
+health_check:
+  enable_health_check: true
+  check_interval_sec: 30
+  timeout_sec: 4
+  unhealthy_threshold: 2
+  healthy_threshold: 2
+  restart_threshold: 60
+
+# Network settings
+vpc_access_connector:
+  name: projects/_/locations/us-central1/connectors/default-connector
+  egress_setting: private-ranges-only

@@ -681,6 +681,40 @@ body.profile-page {
         top: 0;
         max-height: none;
     }
+
+    .workflow-tabs {
+        flex-direction: column;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .workflow-tab {
+        min-width: auto;
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .workflow-tab:last-child {
+        border-bottom: none;
+    }
+
+    .tab-number {
+        margin: 0;
+        flex-shrink: 0;
+    }
+
+    .tab-title {
+        flex: 1;
+        text-align: left;
+    }
+
+    .workflow-step {
+        padding: 1.5rem;
+    }
 }
 
 /* Profile Page */
@@ -862,17 +896,116 @@ body.profile-page .dashboard-main {
     font-size: 0.9rem;
 }
 
-.workflow-steps {
-    display: grid;
-    gap: 1rem;
+.workflow-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.workflow-tabs {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    overflow-x: auto;
+}
+
+.workflow-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-width: 200px;
+    text-align: center;
+    border-right: 1px solid #e2e8f0;
+}
+
+.workflow-tab:last-child {
+    border-right: none;
+}
+
+.workflow-tab:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.workflow-tab:not(:disabled):hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.workflow-tab.active {
+    background: #ffffff;
+    color: #2563eb;
+    box-shadow: 0 2px 0 #2563eb;
+}
+
+.workflow-tab.completed {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+}
+
+.workflow-tab.completed:not(.active):hover {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+.tab-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0 auto 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.workflow-tab.active .tab-number {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.workflow-tab.completed .tab-number {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.workflow-tab:disabled .tab-number {
+    background: #f1f5f9;
+    color: #cbd5e1;
+}
+
+.tab-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.workflow-content {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
 }
 
 .workflow-step {
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 1.25rem;
-    background: #f8faff;
-    box-shadow: 0 4px 10px rgba(148, 163, 184, 0.15);
+    display: none;
+    padding: 2rem;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.workflow-step.active {
+    display: block;
 }
 
 .workflow-step h3 {

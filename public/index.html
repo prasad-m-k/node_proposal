@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI RFP Proposal Generator</title>
+    <link rel="stylesheet" href="/common.css">
     <link id="themeStylesheet" rel="stylesheet" href="/bright.css">
     <script>
         (function() {
@@ -21,70 +22,87 @@
     </script>
 </head>
 <body class="theme-bright app-page">
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">AI RFP Proposal Generator</div>
-            <div class="user-section">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <span id="username">Loading...</span>
-                </div>
-                <a href="/profile" class="profile-btn">Edit Profile</a>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+    <!-- Top Header Bar -->
+    <header class="top-header">
+        <div class="header-nav">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="page-title">AI RFP Proposal Generator</div>
+            <button class="menu-btn">☰</button>
+        </div>
+        <div class="header-actions">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="username">Loading...</span>
             </div>
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+            <a href="/profile" class="profile-btn">Profile</a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </header>
 
-    <main class="dashboard-main">
-        <aside class="proposal-pane" aria-label="Proposal tasks">
-            <div class="pane-header">
-                <div>
-                    <h2>Proposal Tasks</h2>
-                    <p class="pane-subtitle">Each proposal tracks four key steps from RFP intake to final review.</p>
-                </div>
-                <div class="pane-controls">
-                    <button id="collapsePaneBtn" class="pane-toggle" type="button" aria-expanded="true" aria-label="Collapse proposal pane">⟨</button>
-                    <button id="newProposalBtn" class="btn-create-proposal" type="button">+ New</button>
-                </div>
+    <!-- Main Layout Container -->
+    <main class="layout-container">
+        <!-- Left Panel -->
+        <aside class="left-panel" id="leftPanel">
+            <div class="panel-header">
+                <h2>Proposals</h2>
+                <button id="newProposalBtn" class="btn-create-proposal" type="button">+ New</button>
             </div>
-            <div id="proposalError" class="proposal-message" role="alert" aria-live="polite"></div>
-            <div id="proposalTree" class="proposal-tree" role="tree"></div>
+            <div class="panel-content">
+                <div id="proposalError" class="proposal-message" role="alert" aria-live="polite"></div>
+                <div id="proposalTree" class="proposal-tree" role="tree"></div>
+            </div>
         </aside>
 
-        <div class="resize-handle" id="resizeHandle"></div>
+        <!-- Resize Handle -->
+        <div class="resize-handle" id="resizeHandle">
+            <div class="resize-grip"></div>
+        </div>
 
-        <section class="content-area" id="contentArea">
-            <section class="home-content" id="homeContent">
-                <section class="welcome-section">
-                    <h1>Welcome to AI RFP Proposal Generator</h1>
-                    <p>
-                        Generate professional, comprehensive RFP proposals using artificial intelligence.
-                        Our platform helps you create winning proposals quickly and efficiently.
-                    </p>
-                </section>
+        <!-- Right Panel -->
+        <section class="right-panel" id="rightPanel">
+            <div class="home-flow" id="homeContent">
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">AI RFP Proposal Generator</h1>
+                        <p class="hero-subtitle">
+                            Generate professional, comprehensive RFP proposals using artificial intelligence.
+                            Create winning proposals quickly and efficiently with our intelligent platform.
+                        </p>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="floating-element element-1"></div>
+                        <div class="floating-element element-2"></div>
+                        <div class="floating-element element-3"></div>
+                    </div>
+                </div>
 
-                <div class="features-grid">
-                    <div class="feature-card">
+                <div class="features-flow">
+                    <div class="feature-bubble large">
+                        <div class="feature-icon">🧠</div>
                         <h3>Smart Analysis</h3>
                         <p>AI-powered analysis of RFP requirements to ensure comprehensive proposal coverage.</p>
                     </div>
 
-                    <div class="feature-card">
+                    <div class="feature-bubble medium">
+                        <div class="feature-icon">📚</div>
                         <h3>Template Library</h3>
-                        <p>Access to professional proposal templates tailored for different industries and sectors.</p>
+                        <p>Access to professional proposal templates tailored for different industries.</p>
                     </div>
 
-                    <div class="feature-card">
-                        <h3>Collaboration Tools</h3>
-                        <p>Work with your team in real-time to create and refine proposals collaboratively.</p>
+                    <div class="feature-bubble small">
+                        <div class="feature-icon">👥</div>
+                        <h3>Collaboration</h3>
+                        <p>Work with your team in real-time to create and refine proposals.</p>
                     </div>
 
-                    <div class="feature-card">
+                    <div class="feature-bubble medium">
+                        <div class="feature-icon">📄</div>
                         <h3>Export Options</h3>
-                        <p>Export your proposals in multiple formats including PDF, Word, and presentation slides.</p>
+                        <p>Export in multiple formats including PDF, Word, and presentation slides.</p>
                     </div>
                 </div>
-            </section>
+            </div>
 
             <section class="work-area" id="workArea" hidden>
                 <div class="work-area-header">

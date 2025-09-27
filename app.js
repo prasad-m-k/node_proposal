@@ -285,6 +285,50 @@ function createApp() {
         }
     });
 
+    // View artifact content
+    app.get('/api/proposals/:proposalId/artifacts/:fileName/view', auth.requireAuth, async (req, res) => {
+        try {
+            const file = await proposalService.downloadArtifact(
+                req.user.id,
+                req.params.proposalId,
+                req.params.fileName
+            );
+
+            res.json({
+                success: true,
+                content: file.content,
+                fileName: req.params.fileName,
+                size: file.size,
+                modified: file.modified
+            });
+        } catch (error) {
+            console.error('View artifact error:', error);
+            res.status(400).json({ success: false, message: error.message || 'Failed to view artifact' });
+        }
+    });
+
+    // Update artifact content
+    app.put('/api/proposals/:proposalId/artifacts/:fileName', auth.requireAuth, async (req, res) => {
+        try {
+            const { content } = req.body;
+            if (!content) {
+                return res.status(400).json({ success: false, message: 'Content is required' });
+            }
+
+            const result = await proposalService.updateArtifact(
+                req.user.id,
+                req.params.proposalId,
+                req.params.fileName,
+                content
+            );
+
+            res.json({ success: true, message: 'Artifact updated successfully', artifact: result });
+        } catch (error) {
+            console.error('Update artifact error:', error);
+            res.status(400).json({ success: false, message: error.message || 'Failed to update artifact' });
+        }
+    });
+
     // 404 handler
     app.use((req, res) => {
         res.status(404).redirect('/login');

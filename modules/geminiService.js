@@ -20,18 +20,31 @@ class GeminiService {
         this.genAI = new GoogleGenerativeAI(this.apiKey);
 
         // Fallback model order - try these in sequence if one fails
-        this.modelFallbacks = [
+        /*this.modelFallbacks = [
+            'gemini-2.0-flash',  // Most capable, but often has quota issues
             'gemini-1.5-flash',
             'gemini-1.5-pro',
             'gemini-pro',  // Legacy stable model
             'gemini-2.0-flash-exp'  // Keep as last option due to quota issues
+        ]; */
+        this.modelFallbacks = [
+            'gemini-2.0-flash'
         ];
+        
 
         this.currentModelIndex = 0;
         this.model = this.genAI.getGenerativeModel({ model: this.modelFallbacks[0] });
     }
 
     async analyzeRFPDocument(filePath, fileName, proposalName) {
+
+        //const result = await this.model.generateContent("Give me a three-line poem about the sea.");
+        //const response = result.response;
+        //const analysisText = response.text();
+        //console.log(analysisText);
+        //return analysisText;
+
+        console.log(`Starting analysis for file: ${filePath}/${fileName} under proposal: ${proposalName}`);
         const fileContent = await fs.readFile(filePath, 'utf-8');
         return await this.analyzeWithFallback(fileContent, fileName, proposalName);
     }

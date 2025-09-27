@@ -140,33 +140,52 @@ export class ProposalManager {
     }
 
     showHomeView() {
+        console.log('ProposalManager: showHomeView called');
+
         if (this.activeProposalName) {
             this.activeProposalName.textContent = 'Select a proposal to get started';
         }
         if (this.activeProposalSubtitle) {
             this.activeProposalSubtitle.textContent = 'Choose a proposal on the left to walk through the workflow.';
         }
+
+        // Hide work area
         if (this.workArea) {
+            console.log('Hiding work area');
             this.workArea.classList.remove('visible');
             this.workArea.hidden = true;
         }
+
+        // Show home content
         if (this.homeContent) {
+            console.log('Showing home content');
             this.homeContent.hidden = false;
+            this.homeContent.style.display = '';
         }
     }
 
     showWorkView(proposal) {
+        console.log('ProposalManager: showWorkView called for proposal:', proposal.name);
+
         if (this.activeProposalName) {
             this.activeProposalName.textContent = proposal.name || 'Untitled Proposal';
         }
         if (this.activeProposalSubtitle) {
             this.activeProposalSubtitle.textContent = 'Work through each step to build a complete proposal.';
         }
+
+        // Hide home content
         if (this.homeContent) {
+            console.log('Hiding home content');
             this.homeContent.hidden = true;
+            this.homeContent.style.display = 'none';
         }
+
+        // Show work area
         if (this.workArea) {
+            console.log('Showing work area');
             this.workArea.removeAttribute('hidden');
+            this.workArea.hidden = false;
             this.workArea.classList.add('visible');
         }
     }

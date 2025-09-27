@@ -38,10 +38,11 @@ class RfpProposalApp extends EventEmitter {
     initDomElements() {
         this.elements = {
             // Layout elements
-            dashboardMain: DomUtils.querySelector('.dashboard-main'),
-            proposalPane: DomUtils.querySelector('.proposal-pane'),
+            layoutContainer: DomUtils.querySelector('.layout-container'),
+            leftPanel: DomUtils.querySelector('.left-panel'),
+            rightPanel: DomUtils.querySelector('.right-panel'),
             resizeHandle: DomUtils.getElementById('resizeHandle'),
-            collapsePaneBtn: DomUtils.getElementById('collapsePaneBtn'),
+            themeToggle: DomUtils.getElementById('themeToggle'),
 
             // User elements
             username: DomUtils.getElementById('username'),
@@ -105,6 +106,11 @@ class RfpProposalApp extends EventEmitter {
             const theme = userData.theme || 'bright';
             ThemeUtils.applyTheme(theme);
 
+            // Update theme toggle button
+            if (this.elements.themeToggle) {
+                this.elements.themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+
             this.logger.info('User data loaded:', userData.username);
         } catch (error) {
             this.logger.error('Failed to load user data:', error);
@@ -165,10 +171,10 @@ class RfpProposalApp extends EventEmitter {
             });
         }
 
-        // Pane collapse events
-        if (this.elements.collapsePaneBtn && this.elements.dashboardMain) {
-            DomUtils.addEventListener(this.elements.collapsePaneBtn, 'click', () => {
-                this.toggleProposalPane();
+        // Theme toggle events
+        if (this.elements.themeToggle) {
+            DomUtils.addEventListener(this.elements.themeToggle, 'click', () => {
+                this.toggleTheme();
             });
         }
 
@@ -185,22 +191,22 @@ class RfpProposalApp extends EventEmitter {
     }
 
     initializeResizablePane() {
-        if (!this.elements.resizeHandle || !this.elements.proposalPane) return;
+        if (!this.elements.resizeHandle || !this.elements.leftPanel) return;
 
         let isResizing = false;
         let startX = 0;
         let startWidth = 0;
 
         // Load saved width from localStorage
-        const savedWidth = StorageUtils.get('sidebar-width');
+        const savedWidth = StorageUtils.get('left-panel-width');
         if (savedWidth) {
-            document.documentElement.style.setProperty('--sidebar-width', savedWidth + 'px');
+            document.documentElement.style.setProperty('--left-panel-width', savedWidth + 'px');
         }
 
         const startResize = (e) => {
             isResizing = true;
             startX = e.clientX || e.touches[0].clientX;
-            startWidth = this.elements.proposalPane.offsetWidth;
+            startWidth = this.elements.leftPanel.offsetWidth;
 
             this.elements.resizeHandle.classList.add('dragging');
             document.body.style.userSelect = 'none';
@@ -214,9 +220,9 @@ class RfpProposalApp extends EventEmitter {
 
             const clientX = e.clientX || e.touches[0].clientX;
             const deltaX = clientX - startX;
-            const newWidth = Math.max(260, Math.min(600, startWidth + deltaX));
+            const newWidth = Math.max(250, Math.min(500, startWidth + deltaX));
 
-            document.documentElement.style.setProperty('--sidebar-width', newWidth + 'px');
+            document.documentElement.style.setProperty('--left-panel-width', newWidth + 'px');
         };
 
         const stopResize = () => {
@@ -228,8 +234,8 @@ class RfpProposalApp extends EventEmitter {
             document.body.style.cursor = '';
 
             // Save the width
-            const currentWidth = this.elements.proposalPane.offsetWidth;
-            StorageUtils.set('sidebar-width', currentWidth);
+            const currentWidth = this.elements.leftPanel.offsetWidth;
+            StorageUtils.set('left-panel-width', currentWidth);
         };
 
         // Mouse events
@@ -242,7 +248,7 @@ class RfpProposalApp extends EventEmitter {
         DomUtils.addEventListener(document, 'touchmove', doResize);
         DomUtils.addEventListener(document, 'touchend', stopResize);
 
-        this.logger.debug('Resizable pane initialized');
+        this.logger.debug('Resizable left panel initialized');
     }
 
     async loadInitialData() {
@@ -390,16 +396,48 @@ class RfpProposalApp extends EventEmitter {
         const type = DomUtils.createElement('span', { className: 'artifact-type' }, artifact.type);
         const name = DomUtils.createElement('span', { className: 'artifact-name' }, artifact.name);
 
-        const downloadBtn = DomUtils.createElement('button', { className: 'artifact-download' }, 'Download');
+        const actions = DomUtils.createElement('div', { className: 'artifact-actions' });
+
+        const viewBtn = DomUtils.createElement('button', { className: 'artifact-view' }, 'View');
+        DomUtils.addEventListener(viewBtn, 'click', () => {
+            this.viewArtifact(artifact.name);
+        });
+
+        const downloadBtn = DomUtils.createElement('button', { className: 'artifact-download secondary' }, 'Download');
         DomUtils.addEventListener(downloadBtn, 'click', () => {
             this.downloadArtifact(artifact.name);
         });
 
+        actions.appendChild(viewBtn);
+        actions.appendChild(downloadBtn);
+
         item.appendChild(type);
         item.appendChild(name);
-        item.appendChild(downloadBtn);
+        item.appendChild(actions);
 
         return item;
+    }
+
+    async viewArtifact(fileName) {
+        const activeProposal = this.proposalManager.getActiveProposal();
+        if (!activeProposal) {
+            this.proposalManager.showError('No active proposal selected.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/proposals/${activeProposal.id}/artifacts/${fileName}/view`);
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to load artifact');
+            }
+
+            this.showArtifactModal(data);
+        } catch (error) {
+            console.error('View artifact error:', error);
+            this.proposalManager.showError('Failed to load artifact: ' + error.message);
+        }
     }
 
     async downloadArtifact(fileName) {
@@ -419,17 +457,178 @@ class RfpProposalApp extends EventEmitter {
         }
     }
 
-    toggleProposalPane() {
-        if (!this.elements.dashboardMain || !this.elements.collapsePaneBtn) return;
+    showArtifactModal(artifactData) {
+        // Create modal if it doesn't exist
+        let modal = document.getElementById('artifactModal');
+        if (!modal) {
+            modal = this.createArtifactModal();
+            document.body.appendChild(modal);
+        }
 
-        const isCollapsed = this.elements.dashboardMain.classList.toggle('pane-collapsed');
-        this.elements.collapsePaneBtn.setAttribute('aria-expanded', String(!isCollapsed));
-        this.elements.collapsePaneBtn.setAttribute('aria-label',
-            isCollapsed ? 'Expand proposal pane' : 'Collapse proposal pane'
-        );
-        this.elements.collapsePaneBtn.textContent = isCollapsed ? '⟩' : '⟨';
+        // Populate modal content
+        const title = modal.querySelector('.modal-title');
+        const editor = modal.querySelector('.artifact-editor');
+        const saveBtn = modal.querySelector('.save-artifact');
+        const closeBtn = modal.querySelector('.close-modal');
 
-        this.logger.debug('Proposal pane toggled:', isCollapsed ? 'collapsed' : 'expanded');
+        title.textContent = artifactData.fileName;
+        editor.value = artifactData.content;
+
+        // Store current artifact data for saving
+        modal.dataset.fileName = artifactData.fileName;
+
+        // Show modal
+        modal.style.display = 'flex';
+
+        // Focus editor
+        editor.focus();
+
+        // Bind events
+        saveBtn.onclick = () => this.saveArtifact(artifactData.fileName, editor.value);
+        closeBtn.onclick = () => this.closeArtifactModal();
+
+        // Close on background click
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                this.closeArtifactModal();
+            }
+        };
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                this.closeArtifactModal();
+            }
+        });
+    }
+
+    createArtifactModal() {
+        const modal = document.createElement('div');
+        modal.id = 'artifactModal';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content artifact-modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">Artifact Viewer</h3>
+                    <button class="close-modal" type="button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="editor-toolbar">
+                        <button class="editor-btn preview-btn" type="button">Preview</button>
+                        <button class="editor-btn markdown-btn active" type="button">Markdown</button>
+                    </div>
+                    <textarea class="artifact-editor" placeholder="Loading content..."></textarea>
+                    <div class="artifact-preview" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="save-artifact" type="button">Save Changes</button>
+                    <button class="cancel-edit" type="button">Cancel</button>
+                </div>
+            </div>
+        `;
+
+        // Add preview toggle functionality
+        const previewBtn = modal.querySelector('.preview-btn');
+        const markdownBtn = modal.querySelector('.markdown-btn');
+        const editor = modal.querySelector('.artifact-editor');
+        const preview = modal.querySelector('.artifact-preview');
+
+        previewBtn.onclick = () => {
+            previewBtn.classList.add('active');
+            markdownBtn.classList.remove('active');
+            preview.innerHTML = this.markdownToHtml(editor.value);
+            editor.style.display = 'none';
+            preview.style.display = 'block';
+        };
+
+        markdownBtn.onclick = () => {
+            markdownBtn.classList.add('active');
+            previewBtn.classList.remove('active');
+            preview.style.display = 'none';
+            editor.style.display = 'block';
+        };
+
+        const cancelBtn = modal.querySelector('.cancel-edit');
+        cancelBtn.onclick = () => this.closeArtifactModal();
+
+        return modal;
+    }
+
+    async saveArtifact(fileName, content) {
+        const activeProposal = this.proposalManager.getActiveProposal();
+        if (!activeProposal) {
+            this.proposalManager.showError('No active proposal selected.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/proposals/${activeProposal.id}/artifacts/${fileName}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to save artifact');
+            }
+
+            this.proposalManager.showError(''); // Clear any existing errors
+            this.closeArtifactModal();
+
+            // Refresh the proposal data to update artifact info
+            await this.proposalManager.loadProposals(activeProposal.id);
+
+            this.logger.info('Artifact saved:', fileName);
+        } catch (error) {
+            console.error('Save artifact error:', error);
+            this.proposalManager.showError('Failed to save artifact: ' + error.message);
+        }
+    }
+
+    closeArtifactModal() {
+        const modal = document.getElementById('artifactModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    markdownToHtml(markdown) {
+        // Simple markdown to HTML converter
+        return markdown
+            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+            .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>')
+            .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+            .replace(/\*(.*)\*/gim, '<em>$1</em>')
+            .replace(/!\[([^\]]*)\]\(([^\)]*)\)/gim, '<img alt="$1" src="$2" />')
+            .replace(/\[([^\]]*)\]\(([^\)]*)\)/gim, '<a href="$2">$1</a>')
+            .replace(/\n$/gim, '<br />');
+    }
+
+    toggleTheme() {
+        const currentTheme = ThemeUtils.getCurrentTheme();
+        const newTheme = currentTheme === 'bright' ? 'dark' : 'bright';
+
+        ThemeUtils.applyTheme(newTheme);
+
+        // Update theme toggle button
+        if (this.elements.themeToggle) {
+            this.elements.themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Save user preference via API if logged in
+        if (this.currentUser) {
+            this.apiService.updateUserTheme(newTheme).catch(error => {
+                this.logger.error('Failed to save theme preference:', error);
+            });
+        }
+
+        this.logger.debug('Theme toggled to:', newTheme);
     }
 
     updateFileUploadState() {
@@ -500,6 +699,7 @@ async function initApp() {
         if (typeof window !== 'undefined') {
             window.rfpApp = app;
             window.logout = () => app.logout();
+            window.goBack = () => window.history.back();
         }
 
     } catch (error) {

@@ -113,10 +113,23 @@ class ProposalService {
                 throw new Error('Proposal not found');
             }
 
-            // Analyze the document with Gemini
+            // Convert uploaded file to markdown format for better Gemini analysis
+            const markdownContent = await this.fileService.convertToMarkdown(filePath, originalName, proposalId);
+
+            // Save the converted markdown in the proposal directory for analysis
+            const safeBaseName = (proposal.name || 'proposal').replace(/\s+/g, '-').toLowerCase();
+            const markdownFileName = `${safeBaseName}-source-document.md`;
+            const markdownFile = await this.fileService.saveGeneratedFile(
+                markdownContent,
+                markdownFileName,
+                proposalId,
+                'text'
+            );
+
+            // Analyze the document with Gemini using the markdown version
             const analysis = await this.geminiService.analyzeRFPDocument(
-                filePath,
-                originalName,
+                markdownFile.path,
+                markdownFileName,
                 proposal.name
             );
 
@@ -126,7 +139,6 @@ class ProposalService {
             const requirementsDoc = this.geminiService.generateRequirementsMarkdown(analysis);
 
             // Save the generated files
-            const safeBaseName = (proposal.name || 'proposal').replace(/\s+/g, '-').toLowerCase();
 
             const templateFile = await this.fileService.saveGeneratedFile(
                 nunjucksTemplate,
@@ -160,6 +172,13 @@ class ProposalService {
 
             proposal.artifacts = proposal.artifacts || {};
             proposal.artifacts.outputs = [
+                {
+                    id: markdownFile.id,
+                    type: 'Source Document',
+                    name: markdownFile.name,
+                    filePath: markdownFile.path,
+                    createdAt: markdownFile.createdAt
+                },
                 {
                     id: templateFile.id,
                     type: 'Template',
@@ -233,6 +252,37 @@ class ProposalService {
         }
 
         return await this.fileService.getGeneratedFile(proposalId, fileName);
+    }
+
+    async updateArtifact(userId, proposalId, fileName, content) {
+        const proposal = await this.db.getProposalRecord(userId, proposalId);
+        if (!proposal) {
+            throw new Error('Proposal not found');
+        }
+
+        // Find the artifact in the proposal
+        const artifact = proposal.artifacts?.outputs?.find(a => a.name === fileName);
+        if (!artifact) {
+            throw new Error('Artifact not found');
+        }
+
+        // Update the file content
+        const updatedFile = await this.fileService.updateGeneratedFile(proposalId, fileName, content);
+
+        // Update artifact metadata
+        artifact.size = updatedFile.size;
+        artifact.updatedAt = new Date().toISOString();
+
+        // Save the updated proposal
+        proposal.updatedAt = new Date().toISOString();
+        await this.db.saveProposalRecord(proposal);
+
+        return {
+            id: artifact.id,
+            name: fileName,
+            size: updatedFile.size,
+            updated: artifact.updatedAt
+        };
     }
 
     _buildProposal({ userId, name, summary, order }) {

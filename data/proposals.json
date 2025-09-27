@@ -1,156 +1,5 @@
 [
   {
-    "id": "6a78e097-f332-474c-aff0-7017ca161b58",
-    "userId": "26011adc-2deb-4cec-a817-bba930d77690",
-    "name": "Proposal 3",
-    "summary": "mkprasad's Proposal 3",
-    "status": "draft",
-    "documents": [
-      {
-        "id": "5f619550-06c9-4579-aa02-17365597546e",
-        "name": "about_minkh.txt",
-        "uploadedAt": "2025-09-25T15:58:03.060Z",
-        "analysisCompleted": true
-      }
-    ],
-    "subtasks": [
-      {
-        "id": "f0cef0f0-02ef-49f4-bf3b-41115013c7e9",
-        "key": "upload_rfp",
-        "title": "Upload RFP Document",
-        "description": "Upload the client RFP and generate structured artifacts.",
-        "status": "completed",
-        "metadata": {
-          "completedAt": "2025-09-25T15:58:03.060Z",
-          "documentsProcessed": 1
-        }
-      },
-      {
-        "id": "e93aec03-5c4f-4f5c-839a-a8d18f1109e0",
-        "key": "org_details",
-        "title": "Upload Organization Details",
-        "description": "Attach your organization profile and reusable assets.",
-        "status": "pending",
-        "metadata": {}
-      },
-      {
-        "id": "9177945a-0b97-4d6c-83cd-880200000368",
-        "key": "solution_outline",
-        "title": "Draft Solution Outline",
-        "description": "Outline the solution approach and key differentiators.",
-        "status": "pending",
-        "metadata": {}
-      },
-      {
-        "id": "675e7529-10e2-4961-9528-0fbac53c106a",
-        "key": "review_finalize",
-        "title": "Review & Finalize",
-        "description": "Review generated content and prepare submission package.",
-        "status": "pending",
-        "metadata": {}
-      }
-    ],
-    "artifacts": {
-      "templates": [],
-      "requirements": [],
-      "outputs": [
-        {
-          "id": "83c4cc3c-92c0-4bc2-ad93-abeb990fb3d1",
-          "type": "Template",
-          "name": "proposal-3-response-template.md",
-          "filePath": "/Users/deepamk/source/personal/node_proposal/node_proposal/generated/6a78e097-f332-474c-aff0-7017ca161b58/proposal-3-response-template.md",
-          "createdAt": "2025-09-25T15:58:03.056Z"
-        },
-        {
-          "id": "d87355a2-5d99-45ed-8c18-caf32d9d195e",
-          "type": "Variables",
-          "name": "proposal-3-variables.json",
-          "filePath": "/Users/deepamk/source/personal/node_proposal/node_proposal/generated/6a78e097-f332-474c-aff0-7017ca161b58/proposal-3-variables.json",
-          "createdAt": "2025-09-25T15:58:03.059Z"
-        },
-        {
-          "id": "60c6b107-d7cd-4188-892a-6d615e20d9f0",
-          "type": "Requirements",
-          "name": "proposal-3-requirements.md",
-          "filePath": "/Users/deepamk/source/personal/node_proposal/node_proposal/generated/6a78e097-f332-474c-aff0-7017ca161b58/proposal-3-requirements.md",
-          "createdAt": "2025-09-25T15:58:03.060Z"
-        }
-      ],
-      "analysis": {
-        "metadata": {
-          "fileName": "about_minkh.txt",
-          "analysisDate": "2025-09-25T15:57:57.346Z",
-          "proposalName": "Proposal 3",
-          "modelUsed": "gemini-1.5-flash"
-        },
-        "overview": {
-          "title": "Not specified in RFP",
-          "organization": "FCUSD",
-          "dueDate": "Not specified in RFP",
-          "projectSummary": "ELOP program for students, with a special emphasis on supporting underserved youth, integrating music with S.T.E.A.M. education."
-        },
-        "requirements": {
-          "functional": [
-            "Supporting underserved youth",
-            "Integrating music with S.T.E.A.M. education",
-            "Creating an immersive learning experience",
-            "Nurturing creativity, critical thinking, and collaboration",
-            "Encouraging exploration of S.T.E.A.M. career opportunities",
-            "Fostering open communication and emotional expression through music",
-            "Providing a collaborative learning environment",
-            "Offering diverse services encompassing creative S.T.E.A.M. exploration, teamwork and collaboration, and music for optimal wellness"
-          ],
-          "technical": [
-            "Digital music stations",
-            "3D-printed guitar building",
-            "AI-driven music creation",
-            "Coding and programming of robots",
-            "Personalized instruction in bass, lead guitar, keyboards, and drums",
-            "Resources for TK-3rd grade (see attachment)"
-          ],
-          "compliance": [
-            "Not specified in RFP"
-          ],
-          "deliverables": [
-            "Not specified in RFP"
-          ]
-        },
-        "evaluation": {
-          "criteria": [
-            "Not specified in RFP"
-          ],
-          "weights": "Not specified in RFP",
-          "timeline": "Not specified in RFP"
-        },
-        "constraints": {
-          "budget": "Not specified in RFP",
-          "timeline": "Not specified in RFP",
-          "resources": "High cost of technical equipment, products, and services may be a constraint for underserved communities.",
-          "other": [
-            "Bi-weekly payment schedule"
-          ]
-        },
-        "questions": [
-          "What specific S.T.E.A.M. concepts should be emphasized?",
-          "What are the specific learning outcomes expected?",
-          "What is the target number of students?",
-          "What are the specific details regarding the TK-3rd grade program (mentioned in the attachment)?",
-          "What is the overall budget for the program?",
-          "What is the desired program timeline?",
-          "What are the specific evaluation criteria for the program's success?"
-        ],
-        "opportunities": [
-          "Highlighting the unique aspects of the MSTG curriculum and its potential to address the challenges faced by underserved communities.",
-          "Detailing a comprehensive plan for addressing the high cost of technical equipment and ensuring equitable access.",
-          "Emphasizing the program's focus on fostering collaboration, critical thinking, and emotional expression."
-        ]
-      }
-    },
-    "order": 3,
-    "createdAt": "2025-09-25T07:10:19.207Z",
-    "updatedAt": "2025-09-25T15:58:03.060Z"
-  },
-  {
     "id": "73a3089c-fd88-42cf-a13a-83464b9cfc96",
     "userId": "495bd26b-08dc-46a2-9078-a3282f29caca",
     "name": "Proposal 1",
@@ -198,5 +47,192 @@
     "order": 0,
     "createdAt": "2025-09-25T16:01:19.678Z",
     "updatedAt": "2025-09-25T16:01:19.678Z"
+  },
+  {
+    "id": "eea94b37-42bf-4007-a275-9f4b0db3db1c",
+    "userId": "26011adc-2deb-4cec-a817-bba930d77690",
+    "name": "Proposal 2",
+    "summary": "mkprasad's Proposal 2",
+    "status": "draft",
+    "documents": [
+      {
+        "id": "49445248-c0f9-4332-a3ab-deaab2a3de05",
+        "name": "GoldenOne_RFP.docx",
+        "uploadedAt": "2025-09-27T00:37:01.921Z",
+        "analysisCompleted": true
+      }
+    ],
+    "subtasks": [
+      {
+        "id": "e6d84bcc-0c20-4f08-8521-201e1ea05812",
+        "key": "upload_rfp",
+        "title": "Upload RFP Document",
+        "description": "Upload the client RFP and generate structured artifacts.",
+        "status": "completed",
+        "metadata": {
+          "completedAt": "2025-09-27T00:37:01.921Z",
+          "documentsProcessed": 1
+        }
+      },
+      {
+        "id": "5665af13-3d36-4f16-b054-7adfdaec5eb2",
+        "key": "org_details",
+        "title": "Upload Organization Details",
+        "description": "Attach your organization profile and reusable assets.",
+        "status": "pending",
+        "metadata": {}
+      },
+      {
+        "id": "cf171008-04aa-4f45-a91a-a6ed9ac5b61b",
+        "key": "solution_outline",
+        "title": "Draft Solution Outline",
+        "description": "Outline the solution approach and key differentiators.",
+        "status": "pending",
+        "metadata": {}
+      },
+      {
+        "id": "ed1a012f-99ac-4a79-9995-e0ce1dcb5191",
+        "key": "review_finalize",
+        "title": "Review & Finalize",
+        "description": "Review generated content and prepare submission package.",
+        "status": "pending",
+        "metadata": {}
+      }
+    ],
+    "artifacts": {
+      "templates": [],
+      "requirements": [],
+      "outputs": [
+        {
+          "id": "ed1dc976-79b1-4332-860d-bf5f9b160d72",
+          "type": "Source Document",
+          "name": "proposal-2-source-document.md",
+          "filePath": "/Users/deepamk/source/personal/node_proposal/node_proposal/generated/eea94b37-42bf-4007-a275-9f4b0db3db1c/proposal-2-source-document.md",
+          "createdAt": "2025-09-27T00:36:58.765Z"
+        },
+        {
+          "id": "094cade7-8882-4801-9593-5d1953ea25f6",
+          "type": "Template",
+          "name": "proposal-2-response-template.md",
+          "filePath": "/Users/deepamk/source/personal/node_proposal/node_proposal/generated/eea94b37-42bf-4007-a275-9f4b0db3db1c/proposal-2-response-template.md",
+          "createdAt": "2025-09-27T00:37:01.920Z"
+        },
+        {
+          "id": "251be63b-7fc2-4abc-b717-231213d843cc",
+          "type": "Variables",
+          "name": "proposal-2-variables.json",
+          "filePath": "/Users/deepamk/source/personal/node_proposal/node_proposal/generated/eea94b37-42bf-4007-a275-9f4b0db3db1c/proposal-2-variables.json",
+          "createdAt": "2025-09-27T00:37:01.921Z"
+        },
+        {
+          "id": "643263fc-4fc1-4b6e-aed9-d9eb9ac1e235",
+          "type": "Requirements",
+          "name": "proposal-2-requirements.md",
+          "filePath": "/Users/deepamk/source/personal/node_proposal/node_proposal/generated/eea94b37-42bf-4007-a275-9f4b0db3db1c/proposal-2-requirements.md",
+          "createdAt": "2025-09-27T00:37:01.921Z"
+        }
+      ],
+      "analysis": {
+        "metadata": {
+          "fileName": "GoldenOne_RFP.docx",
+          "analysisDate": "2025-09-27T00:36:58.767Z",
+          "proposalName": "Needs clarification (based on RFP content)",
+          "modelUsed": "gemini-2.0-flash"
+        },
+        "overview": {
+          "title": "Not specified in RFP",
+          "organization": "Not specified in RFP",
+          "dueDate": "Not specified in RFP",
+          "projectSummary": "Not specified in RFP"
+        },
+        "requirements": {
+          "functional": [
+            "Not specified in RFP"
+          ],
+          "technical": [
+            "Not specified in RFP"
+          ],
+          "compliance": [
+            "Not specified in RFP"
+          ],
+          "deliverables": [
+            "Not specified in RFP"
+          ]
+        },
+        "evaluation": {
+          "criteria": [
+            "Not specified in RFP"
+          ],
+          "weights": "Not specified in RFP",
+          "timeline": "Not specified in RFP"
+        },
+        "constraints": {
+          "budget": "Not specified in RFP",
+          "timeline": "Not specified in RFP",
+          "resources": "Not specified in RFP",
+          "other": [
+            "Not specified in RFP"
+          ]
+        },
+        "questions": [
+          "Not specified in RFP"
+        ],
+        "opportunities": [
+          "Not specified in RFP"
+        ]
+      }
+    },
+    "order": 2,
+    "createdAt": "2025-09-26T18:53:20.061Z",
+    "updatedAt": "2025-09-27T00:37:01.921Z"
+  },
+  {
+    "id": "a1b97d6d-7e9c-47df-9da1-166f32151144",
+    "userId": "26011adc-2deb-4cec-a817-bba930d77690",
+    "name": "Proposal 1",
+    "summary": "mkprasad's Proposal 1",
+    "status": "draft",
+    "documents": [],
+    "subtasks": [
+      {
+        "id": "739e2c70-92b3-4fe2-a57d-9a6bd610b0de",
+        "key": "upload_rfp",
+        "title": "Upload RFP Document",
+        "description": "Upload the client RFP and generate structured artifacts.",
+        "status": "pending",
+        "metadata": {}
+      },
+      {
+        "id": "bba97102-6c4c-4808-877f-79ddd6da087f",
+        "key": "org_details",
+        "title": "Upload Organization Details",
+        "description": "Attach your organization profile and reusable assets.",
+        "status": "pending",
+        "metadata": {}
+      },
+      {
+        "id": "187b87a9-4a11-4427-9605-d42b3cde46ae",
+        "key": "solution_outline",
+        "title": "Draft Solution Outline",
+        "description": "Outline the solution approach and key differentiators.",
+        "status": "pending",
+        "metadata": {}
+      },
+      {
+        "id": "7b68ead4-2635-4d3f-a70c-415a8f813b56",
+        "key": "review_finalize",
+        "title": "Review & Finalize",
+        "description": "Review generated content and prepare submission package.",
+        "status": "pending",
+        "metadata": {}
+      }
+    ],
+    "artifacts": {
+      "templates": [],
+      "requirements": []
+    },
+    "order": 2,
+    "createdAt": "2025-09-26T19:14:00.921Z",
+    "updatedAt": "2025-09-26T19:14:00.921Z"
   }
 ]
